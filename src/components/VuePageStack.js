@@ -38,14 +38,6 @@ let VuePageStack = keyName => {
     data() {
       return {};
     },
-    props: {
-      max: {
-        type: [String, Number],
-        default() {
-          return '';
-        }
-      }
-    },
     render() {
       let key = this.$route.query[keyName];
       const slot = this.$slots.default;
