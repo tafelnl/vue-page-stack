@@ -9,33 +9,29 @@ localVue.use(VueRouter)
 const router = new VueRouter()
 
 describe('mixin', () => {
+  mixinFunction(router);
   test('push', () => {
-    mixinFunction(router);
     router.push('/router');
     expect(history.action).toBe(config.pushName);
   })
 
   test('replace', () => {
-    mixinFunction(router);
     router.replace('/replace');
     expect(history.action).toBe(config.replaceName);
   })
 
   test('go', () => {
-    mixinFunction(router);
     router.go(-1);
     expect(history.action).toBe(config.goName);
   })
 
   test('forward', () => {
-    mixinFunction(router);
     router.forward();
-    expect(history.action).toBe(config.forwardName);
+    expect(history.action).toBe(config.goName);
   })
 
   test('back', () => {
-    mixinFunction(router);
     router.back();
-    expect(history.action).toBe(config.backName);
+    expect(history.action).toBe(config.goName);
   })
 })
