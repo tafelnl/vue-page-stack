@@ -3,7 +3,7 @@ module.exports = {
   env: {
     node: true
   },
-  extends: ['@vue/standard'],
+  extends: ['plugin:vue/essential', '@vue/standard'],
   /**
    *
    * "off" or 0 - 关闭规则

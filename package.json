@@ -11,6 +11,7 @@
   "main": "dist/vue-page-stack.common.js",
   "dependencies": {},
   "devDependencies": {
+    "core-js": "^2.6.5",
     "@vue/cli-plugin-babel": "^3.11.0",
     "@vue/cli-plugin-eslint": "^3.11.0",
     "@vue/cli-plugin-unit-jest": "^3.11.0",
@@ -25,6 +26,11 @@
     "vue": "^2.6.10",
     "vue-router": "^3.1.3",
     "vue-template-compiler": "^2.6.10"
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
   },
   "browserslist": [
     "> 1%",
