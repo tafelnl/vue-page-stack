@@ -1,6 +1,6 @@
 {
-  "name": "vue-page-stack",
-  "version": "1.4.1",
+  "name": "@tobyas/vue-page-stack",
+  "version": "1.4.2",
   "description": "Routing and navigation for your Vue SPA. Vue 单页应用导航管理器",
   "author": "hezf",
   "scripts": {
@@ -90,7 +90,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hezhongfeng/vue-page-stack.git"
+    "url": "git+https://github.com/hezhongfeng/vue-page-stack.git"
   },
   "bugs": {
     "url": "https://github.com/hezhongfeng/vue-page-stack/issues"

@@ -47,6 +47,7 @@ let VuePageStack = keyName => {
       }
     },
     render() {
+      window.console.log('[VuePageStack] render')
       let key = this.$route.query[keyName];
       const slot = this.$slots.default;
       const vnode = getFirstComponentChild(slot);
