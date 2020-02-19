@@ -22,6 +22,8 @@ function getFirstComponentChild(children) {
 
 const stack = [];
 
+const preventNavigation = false;
+
 function getIndexByKey(key) {
   for (let index = 0; index < stack.length; index++) {
     if (stack[index].key === key) {
@@ -52,6 +54,11 @@ let VuePageStack = keyName => {
       const vnode = getFirstComponentChild(slot);
       window.console.log('[VuePageStack] render', stack, vnode)
       if (!vnode) {
+        return vnode;
+      }
+      if(preventNavigation) {
+        window.console.log('[VuePageStack] preventNavigation')
+        preventNavigation = false;
         return vnode;
       }
       let index = getIndexByKey(key);
@@ -86,4 +93,23 @@ function getStack() {
   return stack;
 }
 
-export { VuePageStack, getIndexByKey, getStack };
+function clearStack() {
+  let goBackN = (stack.length) ? stack.length - 1 : 1;
+  if(!goBackN)
+  {
+    return;
+  }
+  preventNavigation = true;
+
+  // destroy the instances that will be spliced
+  for (let i = 1; i < stack.length; i++) {
+    window.console.log('[VuePageStack] render - $destroy')
+    stack[i].vnode.componentInstance.$destroy();
+    stack[i] = null;
+  }
+  stack.splice(index + 1);
+
+  window.history.go(-goBackN);
+}
+
+export { VuePageStack, getIndexByKey, getStack, clearStack };
