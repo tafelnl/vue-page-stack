@@ -886,7 +886,7 @@ module.exports = function (exec) {
 /***/ "8378":
 /***/ (function(module, exports) {
 
-var core = module.exports = { version: '2.6.9' };
+var core = module.exports = { version: '2.6.11' };
 if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 
 
@@ -1562,6 +1562,7 @@ var VuePageStack_VuePageStack = function VuePageStack(keyName) {
       }
     },
     render: function render() {
+      window.console.log('[VuePageStack] render');
       var key = this.$route.query[keyName];
       var slot = this.$slots.default;
       var vnode = getFirstComponentChild(slot);
@@ -1728,7 +1729,8 @@ VuePageStackPlugin.install = function (Vue, _ref) {
         params: to.params
       });
     }
-  }
+  } // ensure it's the first beforeEach hook
+
 
   router.beforeHooks.unshift(beforeEach);
 };
