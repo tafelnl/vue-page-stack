@@ -1562,10 +1562,10 @@ var VuePageStack_VuePageStack = function VuePageStack(keyName) {
       }
     },
     render: function render() {
-      window.console.log('[VuePageStack] render');
       var key = this.$route.query[keyName];
       var slot = this.$slots.default;
       var vnode = getFirstComponentChild(slot);
+      window.console.log('[VuePageStack] render', stack, vnode);
 
       if (!vnode) {
         return vnode;
@@ -1574,17 +1574,22 @@ var VuePageStack_VuePageStack = function VuePageStack(keyName) {
       var index = getIndexByKey(key);
 
       if (index !== -1) {
+        window.console.log('[VuePageStack] render - index !== -1');
         vnode.componentInstance = stack[index].vnode.componentInstance; // destroy the instances that will be spliced
 
         for (var i = index + 1; i < stack.length; i++) {
+          window.console.log('[VuePageStack] render - $destroy');
           stack[i].vnode.componentInstance.$destroy();
           stack[i] = null;
         }
 
         stack.splice(index + 1);
       } else {
+        window.console.log('[VuePageStack] render - index === -1');
+
         if (src_history.action === config.replaceName) {
           // destroy the instance
+          window.console.log('[VuePageStack] render - $destroy');
           stack[stack.length - 1].vnode.componentInstance.$destroy();
           stack[stack.length - 1] = null;
           stack.splice(stack.length - 1);
