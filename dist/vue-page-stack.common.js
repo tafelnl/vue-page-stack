@@ -1484,6 +1484,10 @@ var es6_regexp_replace = __webpack_require__("a481");
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es6.number.constructor.js
 var es6_number_constructor = __webpack_require__("c5f6");
 
+// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/readOnlyError.js
+function _readOnlyError(name) {
+  throw new Error("\"" + name + "\" is read-only");
+}
 // CONCATENATED MODULE: ./src/config/config.js
 /* harmony default export */ var config = ({
   componentName: 'VuePageStack',
@@ -1501,6 +1505,7 @@ var histoty = {
 };
 /* harmony default export */ var src_history = (histoty);
 // CONCATENATED MODULE: ./src/components/VuePageStack.js
+
 
 
 
@@ -1526,11 +1531,12 @@ function getFirstComponentChild(children) {
 }
 
 var stack = [];
+var preventNavigation = false;
 
 function getIndexByKey(key) {
-  for (var index = 0; index < stack.length; index++) {
-    if (stack[index].key === key) {
-      return index;
+  for (var _index = 0; _index < stack.length; _index++) {
+    if (stack[_index].key === key) {
+      return _index;
     }
   }
 
@@ -1559,6 +1565,12 @@ var VuePageStack_VuePageStack = function VuePageStack(keyName) {
       window.console.log('[VuePageStack] render', stack, vnode);
 
       if (!vnode) {
+        return vnode;
+      }
+
+      if (preventNavigation) {
+        window.console.log('[VuePageStack] preventNavigation');
+        preventNavigation = (_readOnlyError("preventNavigation"), false);
         return vnode;
       }
 
@@ -1600,6 +1612,25 @@ var VuePageStack_VuePageStack = function VuePageStack(keyName) {
 
 function getStack() {
   return stack;
+}
+
+function clearStack() {
+  var goBackN = stack.length ? stack.length - 1 : 1;
+
+  if (!goBackN) {
+    return;
+  }
+
+  preventNavigation = (_readOnlyError("preventNavigation"), true); // destroy the instances that will be spliced
+
+  for (var i = 1; i < stack.length; i++) {
+    window.console.log('[VuePageStack] render - $destroy');
+    stack[i].vnode.componentInstance.$destroy();
+    stack[i] = null;
+  }
+
+  stack.splice(index + 1);
+  window.history.go(-goBackN);
 }
 
 
@@ -1695,7 +1726,8 @@ VuePageStackPlugin.install = function (Vue, _ref) {
 
   Vue.component(name, VuePageStack_VuePageStack(keyName));
   Vue.prototype.$pageStack = {
-    getStack: getStack
+    getStack: getStack,
+    clearStack: clearStack
   };
   mixin(router);
 
