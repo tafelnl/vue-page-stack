@@ -22,7 +22,7 @@ function getFirstComponentChild(children) {
 
 const stack = [];
 
-const preventNavigation = false;
+let preventNavigation = false;
 
 function getIndexByKey(key) {
   for (let index = 0; index < stack.length; index++) {
