@@ -1493,10 +1493,6 @@ var es6_regexp_replace = __webpack_require__("a481");
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es6.number.constructor.js
 var es6_number_constructor = __webpack_require__("c5f6");
 
-// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/readOnlyError.js
-function _readOnlyError(name) {
-  throw new Error("\"" + name + "\" is read-only");
-}
 // CONCATENATED MODULE: ./src/config/config.js
 /* harmony default export */ var config = ({
   componentName: 'VuePageStack',
@@ -1514,7 +1510,6 @@ var histoty = {
 };
 /* harmony default export */ var src_history = (histoty);
 // CONCATENATED MODULE: ./src/components/VuePageStack.js
-
 
 
 
@@ -1579,7 +1574,7 @@ var VuePageStack_VuePageStack = function VuePageStack(keyName) {
 
       if (preventNavigation) {
         window.console.log('[VuePageStack] preventNavigation');
-        preventNavigation = (_readOnlyError("preventNavigation"), false);
+        preventNavigation = false;
         return vnode;
       }
 
@@ -1630,7 +1625,7 @@ function clearStack() {
     return;
   }
 
-  preventNavigation = (_readOnlyError("preventNavigation"), true); // destroy the instances that will be spliced
+  preventNavigation = true; // destroy the instances that will be spliced
 
   for (var i = 1; i < stack.length; i++) {
     window.console.log('[VuePageStack] render - $destroy');
