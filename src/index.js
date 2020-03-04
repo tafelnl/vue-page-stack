@@ -32,6 +32,11 @@ VuePageStackPlugin.install = function(Vue, { router, name = config.componentName
 
   function beforeEach(to, from, next) {
     window.console.log('[VuePageStack] preventNavigation', preventNavigation)
+    if(preventNavigation) {
+      window.console.log('[VuePageStack] preventNavigation')
+      preventNavigation = false;
+      return;
+    }
     if (!hasKey(to.query, keyName)) {
       to.query[keyName] = getKey('xxxxxxxx');
       let replace = history.action === config.replaceName || !hasKey(from.query, keyName);
