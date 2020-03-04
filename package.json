@@ -5,11 +5,11 @@
   "author": "hezf",
   "scripts": {
     "test:unit": "vue-cli-service test:unit",
-    "build": "vue-cli-service build --target lib --name index ./src/index.js",
+    "build": "vue-cli-service build --target lib --name vue-page-stack ./src/index.js",
     "lint": "vue-cli-service lint",
     "cz": "git-cz"
   },
-  "main": "dist/index.common.js",
+  "main": "dist/vue-page-stack.common.js",
   "dependencies": {},
   "devDependencies": {
     "@commitlint/cli": "^8.2.0",
