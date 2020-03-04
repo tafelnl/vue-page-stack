@@ -1,4 +1,4 @@
-import { VuePageStack, getIndexByKey, getStack, clearStack } from './components/VuePageStack';
+import { VuePageStack, getIndexByKey, getStack, clearStack, preventNavigation } from './components/VuePageStack';
 import mixin from './mixin';
 import history from './history';
 import config from './config/config';
@@ -31,6 +31,7 @@ VuePageStackPlugin.install = function(Vue, { router, name = config.componentName
   mixin(router);
 
   function beforeEach(to, from, next) {
+    window.console.log('[VuePageStack] preventNavigation', preventNavigation)
     if (!hasKey(to.query, keyName)) {
       to.query[keyName] = getKey('xxxxxxxx');
       let replace = history.action === config.replaceName || !hasKey(from.query, keyName);

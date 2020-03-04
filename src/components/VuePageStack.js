@@ -108,8 +108,9 @@ function clearStack() {
     stack[i] = null;
   }
   stack.splice(1);
+  window.console.log('[VuePageStack] clearStack', stack)
 
   window.history.go(-goBackN);
 }
 
-export { VuePageStack, getIndexByKey, getStack, clearStack };
+export { VuePageStack, getIndexByKey, getStack, clearStack, preventNavigation };
