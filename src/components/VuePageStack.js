@@ -113,4 +113,11 @@ function clearStack() {
   window.history.go(-goBackN);
 }
 
-export { VuePageStack, getIndexByKey, getStack, clearStack, preventNavigation };
+function getPreventNavigation() {
+  return preventNavigation;
+}
+function setPreventNavigation(value) {
+  return preventNavigation = value;
+}
+
+export { VuePageStack, getIndexByKey, getStack, clearStack, getPreventNavigation, setPreventNavigation };

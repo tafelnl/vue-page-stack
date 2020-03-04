@@ -1,4 +1,4 @@
-import { VuePageStack, getIndexByKey, getStack, clearStack, preventNavigation } from './components/VuePageStack';
+import { VuePageStack, getIndexByKey, getStack, clearStack, getPreventNavigation, setPreventNavigation } from './components/VuePageStack';
 import mixin from './mixin';
 import history from './history';
 import config from './config/config';
@@ -31,10 +31,10 @@ VuePageStackPlugin.install = function(Vue, { router, name = config.componentName
   mixin(router);
 
   function beforeEach(to, from, next) {
-    window.console.log('[VuePageStack] preventNavigation', preventNavigation)
-    if(preventNavigation) {
+    window.console.log('[VuePageStack] preventNavigation', getPreventNavigation())
+    if(getPreventNavigation()) {
       window.console.log('[VuePageStack] preventNavigation')
-      preventNavigation = false;
+      setPreventNavigation(false);
       return;
     }
     if (!hasKey(to.query, keyName)) {
