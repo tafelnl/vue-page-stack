@@ -94,23 +94,31 @@ function getStack() {
 }
 
 function clearStack() {
-  let goBackN = (stack.length) ? stack.length - 1 : 1;
-  if(!goBackN)
-  {
-    return;
-  }
-  preventNavigation = true;
+  return new Promise((resolve, reject) => {
+    let goBackN = (stack.length) ? stack.length - 1 : 1;
+    if(!goBackN)
+    {
+      // @TODO(1)
+      return;
+    }
+    preventNavigation = true;
 
-  // destroy the instances that will be spliced
-  for (let i = 1; i < stack.length; i++) {
-    window.console.log('[VuePageStack] render - $destroy')
-    stack[i].vnode.componentInstance.$destroy();
-    stack[i] = null;
-  }
-  stack.splice(1);
-  window.console.log('[VuePageStack] clearStack', stack)
+    // destroy the instances that will be spliced
+    for (let i = 1; i < stack.length; i++) {
+      window.console.log('[VuePageStack] render - $destroy')
+      stack[i].vnode.componentInstance.$destroy();
+      stack[i] = null;
+    }
+    stack.splice(1);
+    window.console.log('[VuePageStack] clearStack', stack)
 
-  window.history.go(-goBackN);
+    window.history.go(-goBackN);
+
+    // timeout needed to let window.history.go(-goBackN); finish first
+    setTimeout(() => {
+      resolve();
+    }, 10);
+  });
 }
 
 function getPreventNavigation() {
