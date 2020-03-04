@@ -107,7 +107,7 @@ function clearStack() {
     stack[i].vnode.componentInstance.$destroy();
     stack[i] = null;
   }
-  stack.splice(index + 1);
+  stack.splice(1);
 
   window.history.go(-goBackN);
 }
