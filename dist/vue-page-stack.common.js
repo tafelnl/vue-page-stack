@@ -1625,6 +1625,7 @@ function clearStack() {
   }
 
   stack.splice(1);
+  window.console.log('[VuePageStack] clearStack', stack);
   window.history.go(-goBackN);
 }
 
@@ -1727,6 +1728,8 @@ VuePageStackPlugin.install = function (Vue, _ref) {
   mixin(router);
 
   function beforeEach(to, from, next) {
+    window.console.log('[VuePageStack] preventNavigation', preventNavigation);
+
     if (!hasKey(to.query, keyName)) {
       to.query[keyName] = getKey('xxxxxxxx');
       var replace = src_history.action === config.replaceName || !hasKey(from.query, keyName);
