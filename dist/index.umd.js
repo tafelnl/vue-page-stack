@@ -1,5 +1,14 @@
-module.exports =
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["VuePageStack"] = factory();
+	else
+		root["VuePageStack"] = factory();
+})((typeof self !== 'undefined' ? self : this), function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -1496,10 +1505,10 @@ var es6_number_constructor = __webpack_require__("c5f6");
 });
 // CONCATENATED MODULE: ./src/history.js
 
-var histoty = {
+var history_history = {
   action: config.pushName
 };
-/* harmony default export */ var src_history = (histoty);
+/* harmony default export */ var src_history = (history_history);
 // CONCATENATED MODULE: ./src/components/VuePageStack.js
 
 
@@ -1529,9 +1538,9 @@ var stack = [];
 var preventNavigation = false;
 
 function getIndexByKey(key) {
-  for (var _index = 0; _index < stack.length; _index++) {
-    if (stack[_index].key === key) {
-      return _index;
+  for (var index = 0; index < stack.length; index++) {
+    if (stack[index].key === key) {
+      return index;
     }
   }
 
@@ -1624,7 +1633,7 @@ function clearStack() {
     stack[i] = null;
   }
 
-  stack.splice(index + 1);
+  stack.splice(1);
   window.history.go(-goBackN);
 }
 
@@ -1778,4 +1787,5 @@ module.exports = '\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u20
 /***/ })
 
 /******/ })["default"];
-//# sourceMappingURL=vue-page-stack.common.js.map
+});
+//# sourceMappingURL=index.umd.js.map
