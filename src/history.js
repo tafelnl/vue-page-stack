@@ -1,7 +1,7 @@
 import config from './config/config';
 
-const histoty = {
+const history = {
   action: config.pushName
 };
 
-export default histoty;
+export default history;
