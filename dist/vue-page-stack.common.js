@@ -1526,7 +1526,7 @@ function getFirstComponentChild(children) {
 }
 
 var stack = [];
-var preventNavigation = false;
+var VuePageStack_preventNavigation = false;
 
 function getIndexByKey(key) {
   for (var index = 0; index < stack.length; index++) {
@@ -1563,9 +1563,9 @@ var VuePageStack_VuePageStack = function VuePageStack(keyName) {
         return vnode;
       }
 
-      if (preventNavigation) {
+      if (VuePageStack_preventNavigation) {
         window.console.log('[VuePageStack] preventNavigation');
-        preventNavigation = false;
+        VuePageStack_preventNavigation = false;
         return vnode;
       }
 
@@ -1616,7 +1616,7 @@ function clearStack() {
     return;
   }
 
-  preventNavigation = true; // destroy the instances that will be spliced
+  VuePageStack_preventNavigation = true; // destroy the instances that will be spliced
 
   for (var i = 1; i < stack.length; i++) {
     window.console.log('[VuePageStack] render - $destroy');
@@ -1728,7 +1728,13 @@ VuePageStackPlugin.install = function (Vue, _ref) {
   mixin(router);
 
   function beforeEach(to, from, next) {
-    window.console.log('[VuePageStack] preventNavigation', preventNavigation);
+    window.console.log('[VuePageStack] preventNavigation', VuePageStack_preventNavigation);
+
+    if (VuePageStack_preventNavigation) {
+      window.console.log('[VuePageStack] preventNavigation');
+      preventNavigation = false;
+      return;
+    }
 
     if (!hasKey(to.query, keyName)) {
       to.query[keyName] = getKey('xxxxxxxx');
