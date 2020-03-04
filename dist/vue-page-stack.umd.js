@@ -1535,7 +1535,7 @@ function getFirstComponentChild(children) {
 }
 
 var stack = [];
-var VuePageStack_preventNavigation = false;
+var preventNavigation = false;
 
 function getIndexByKey(key) {
   for (var index = 0; index < stack.length; index++) {
@@ -1572,9 +1572,9 @@ var VuePageStack_VuePageStack = function VuePageStack(keyName) {
         return vnode;
       }
 
-      if (VuePageStack_preventNavigation) {
+      if (preventNavigation) {
         window.console.log('[VuePageStack] preventNavigation');
-        VuePageStack_preventNavigation = false;
+        preventNavigation = false;
         return vnode;
       }
 
@@ -1625,7 +1625,7 @@ function clearStack() {
     return;
   }
 
-  VuePageStack_preventNavigation = true; // destroy the instances that will be spliced
+  preventNavigation = true; // destroy the instances that will be spliced
 
   for (var i = 1; i < stack.length; i++) {
     window.console.log('[VuePageStack] render - $destroy');
@@ -1636,6 +1636,14 @@ function clearStack() {
   stack.splice(1);
   window.console.log('[VuePageStack] clearStack', stack);
   window.history.go(-goBackN);
+}
+
+function getPreventNavigation() {
+  return preventNavigation;
+}
+
+function setPreventNavigation(value) {
+  return preventNavigation = value;
 }
 
 
@@ -1737,11 +1745,11 @@ VuePageStackPlugin.install = function (Vue, _ref) {
   mixin(router);
 
   function beforeEach(to, from, next) {
-    window.console.log('[VuePageStack] preventNavigation', VuePageStack_preventNavigation);
+    window.console.log('[VuePageStack] preventNavigation', getPreventNavigation());
 
-    if (VuePageStack_preventNavigation) {
+    if (getPreventNavigation()) {
       window.console.log('[VuePageStack] preventNavigation');
-      preventNavigation = false;
+      setPreventNavigation(false);
       return;
     }
 
