@@ -23,6 +23,8 @@ function getFirstComponentChild(children) {
 const stack = [];
 
 let preventNavigation = false;
+let currentRoute = null;
+let vnode = null;
 
 function getIndexByKey(key) {
   for (let index = 0; index < stack.length; index++) {
@@ -49,9 +51,10 @@ let VuePageStack = keyName => {
       }
     },
     render() {
+      currentRoute = this.$route;
       let key = this.$route.query[keyName];
       const slot = this.$slots.default;
-      const vnode = getFirstComponentChild(slot);
+      vnode = getFirstComponentChild(slot);
       window.console.log('[VuePageStack] render', stack, vnode)
       if (!vnode) {
         return vnode;
@@ -63,6 +66,7 @@ let VuePageStack = keyName => {
       }
       let index = getIndexByKey(key);
       if (index !== -1) {
+        // went back in browser history to existing route
         window.console.log('[VuePageStack] render - index !== -1')
         vnode.componentInstance = stack[index].vnode.componentInstance;
         // destroy the instances that will be spliced
@@ -75,12 +79,16 @@ let VuePageStack = keyName => {
       } else {
         window.console.log('[VuePageStack] render - index === -1')
         if (history.action === config.replaceName) {
-          // destroy the instance
+          // route gets replaced
+          // replace stack item with new route
+          // first destroy the instance
           window.console.log('[VuePageStack] render - $destroy')
           stack[stack.length - 1].vnode.componentInstance.$destroy();
           stack[stack.length - 1] = null;
+          // then remove fram stack
           stack.splice(stack.length - 1);
         }
+        // add new route to stack
         stack.push({ key, vnode });
       }
       vnode.data.keepAlive = true;
@@ -89,38 +97,90 @@ let VuePageStack = keyName => {
   };
 };
 
-function getStack() {
-  return stack;
+/**
+ * clearStackToCurrent()
+ * Works as follows:
+ * 1. clearStack completely
+ * 2. except the current item (last in stack)
+ * 3. window.history.go(-goBackN)
+ * 4. HistoryUtils.replace(currentRouteFullPath) (to make sure location.reload() will load correct page)
+ */
+function clearStackToCurrent() {
+  return _clearStack(null, stack.length - 1, true, true);
 }
 
-function clearStack() {
+/**
+ * clearStackToFirst()
+ * Works as follows:
+ * 1. clearStack completely
+ * 2. except the first item (first in stack)
+ * 3. window.history.go(-goBackN)
+ * 4. HistoryUtils.replace(currentRouteFullPath) (to make sure location.reload() will load correct page)
+ */
+function clearStackToFirst(route) {
+  let currentRouteFullPath = (currentRoute) ? currentRoute.fullPath : window.location.href;
+  return _clearStack(route);
+}
+
+function _clearStack(replaceLeftOverItemWithRoute = null, indexToLeave = 0, preventNavigationFlag = true, replaceHistoryPathFlag = false) {
   return new Promise((resolve, reject) => {
+    let currentRouteFullPath = (currentRoute) ? currentRoute.fullPath : window.location.href;
     let goBackN = (stack.length) ? stack.length - 1 : 1;
-    if(!goBackN)
-    {
+    if(!goBackN) {
       // @TODO(1)
       return;
     }
-    preventNavigation = true;
+
+
+
+    // check if currentVnode is the same as this vnode
+    let key = vnode.query[keyName]
+    let index = getIndexByKey(key);
+    window.console.log('[VuePageStack] _clearStack - check diff', index, indexToLeave);
+    if (index == indexToLeave) {
+      // exactly the same
+      window.console.log('[VuePageStack] _clearStack - same same', index, indexToLeave);
+    } else {
+      // else check if route name is the same
+      if(replaceLeftOverItemWithRoute) {
+        if(replaceLeftOverItemWithRoute.name == stack[i].vnode.componentInstance.$options.name) {
+          window.console.log('[VuePageStack] _clearStack - same NAME', replaceLeftOverItemWithRoute.name);
+        }
+      }
+    }
+
+
 
     // destroy the instances that will be spliced
-    for (let i = 1; i < stack.length; i++) {
-      window.console.log('[VuePageStack] render - $destroy')
-      stack[i].vnode.componentInstance.$destroy();
-      stack[i] = null;
+    for (let i = 0; i < stack.length; i++) {
+      if(i != indexToLeave) {
+        window.console.log('[VuePageStack] _clearStack - $destroy', stack[i]);
+        stack[i].vnode.componentInstance.$destroy();
+        stack[i] = null;
+      }
     }
-    stack.splice(1);
-    window.console.log('[VuePageStack] clearStack', stack)
+    stack = stack[indexToLeave];
+    window.console.log('[VuePageStack] _clearStack', stack)
+
+    if(preventNavigationFlag) {
+      preventNavigation = true;
+    }
 
     window.history.go(-goBackN);
 
     // timeout needed to let window.history.go(-goBackN); finish first
     setTimeout(() => {
+      if(replaceHistoryPathFlag) {
+        window.console.log('[VuePageStack] _clearStack - replaceHistoryPathFlag')
+      }
       resolve();
     }, 10);
   });
 }
 
+function getStack() {
+  return stack;
+}
 function getPreventNavigation() {
   return preventNavigation;
 }
@@ -128,4 +188,4 @@ function setPreventNavigation(value) {
   return preventNavigation = value;
 }
 
-export { VuePageStack, getIndexByKey, getStack, clearStack, getPreventNavigation, setPreventNavigation };
+export { VuePageStack, getIndexByKey, getStack, clearStackToCurrent, getPreventNavigation, setPreventNavigation };
