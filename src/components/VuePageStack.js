@@ -20,7 +20,7 @@ function getFirstComponentChild(children) {
   }
 }
 
-const stack = [];
+let stack = [];
 
 let preventNavigation = false;
 let currentRoute = null;
@@ -134,7 +134,7 @@ function _clearStack(replaceLeftOverItemWithRoute = null, indexToLeave = 0, prev
 
 
     // check if currentVnode is the same as this vnode
-    let key = vnode.query[keyName]
+    let key = vnode.query[config.keyName];
     let index = getIndexByKey(key);
     window.console.log('[VuePageStack] _clearStack - check diff', index, indexToLeave);
     if (index == indexToLeave) {
@@ -143,7 +143,7 @@ function _clearStack(replaceLeftOverItemWithRoute = null, indexToLeave = 0, prev
     } else {
       // else check if route name is the same
       if(replaceLeftOverItemWithRoute) {
-        if(replaceLeftOverItemWithRoute.name == stack[i].vnode.componentInstance.$options.name) {
+        if(replaceLeftOverItemWithRoute.name == stack[indexToLeave].vnode.componentInstance.$options.name) {
           window.console.log('[VuePageStack] _clearStack - same NAME', replaceLeftOverItemWithRoute.name);
         }
       }
