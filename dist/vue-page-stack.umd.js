@@ -2243,10 +2243,6 @@ var es6_promise = __webpack_require__("551c");
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es6.number.constructor.js
 var es6_number_constructor = __webpack_require__("c5f6");
 
-// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/readOnlyError.js
-function _readOnlyError(name) {
-  throw new Error("\"" + name + "\" is read-only");
-}
 // CONCATENATED MODULE: ./src/config/config.js
 /* harmony default export */ var config = ({
   componentName: 'VuePageStack',
@@ -2269,7 +2265,6 @@ var history_history = {
 
 
 
-
 function isDef(v) {
   return v !== undefined && v !== null;
 }
@@ -2280,8 +2275,8 @@ function isAsyncPlaceholder(node) {
 
 function getFirstComponentChild(children) {
   if (Array.isArray(children)) {
-    for (var _i = 0; _i < children.length; _i++) {
-      var c = children[_i];
+    for (var i = 0; i < children.length; i++) {
+      var c = children[i];
 
       if (isDef(c) && (isDef(c.componentOptions) || isAsyncPlaceholder(c))) {
         return c;
@@ -2344,12 +2339,10 @@ var VuePageStack_VuePageStack = function VuePageStack(keyName) {
         window.console.log('[VuePageStack] render - index !== -1');
         vnode.componentInstance = stack[index].vnode.componentInstance; // destroy the instances that will be spliced
 
-        for (var _i2 = index + 1; _i2 < stack.length; _i2++) {
+        for (var i = index + 1; i < stack.length; i++) {
           window.console.log('[VuePageStack] render - $destroy');
-
-          stack[_i2].vnode.componentInstance.$destroy();
-
-          stack[_i2] = null;
+          stack[i].vnode.componentInstance.$destroy();
+          stack[i] = null;
         }
 
         stack.splice(index + 1);
@@ -2422,7 +2415,7 @@ function _clearStack() {
     } // check if currentVnode is the same as this vnode
 
 
-    var key = vnode.query[keyName];
+    var key = vnode.query[config.keyName];
     var index = getIndexByKey(key);
     window.console.log('[VuePageStack] _clearStack - check diff', index, indexToLeave);
 
@@ -2432,24 +2425,22 @@ function _clearStack() {
     } else {
       // else check if route name is the same
       if (replaceLeftOverItemWithRoute) {
-        if (replaceLeftOverItemWithRoute.name == stack[i].vnode.componentInstance.$options.name) {
+        if (replaceLeftOverItemWithRoute.name == stack[indexToLeave].vnode.componentInstance.$options.name) {
           window.console.log('[VuePageStack] _clearStack - same NAME', replaceLeftOverItemWithRoute.name);
         }
       }
     } // destroy the instances that will be spliced
 
 
-    for (var _i3 = 0; _i3 < stack.length; _i3++) {
-      if (_i3 != indexToLeave) {
-        window.console.log('[VuePageStack] _clearStack - $destroy', stack[_i3]);
-
-        stack[_i3].vnode.componentInstance.$destroy();
-
-        stack[_i3] = null;
+    for (var i = 0; i < stack.length; i++) {
+      if (i != indexToLeave) {
+        window.console.log('[VuePageStack] _clearStack - $destroy', stack[i]);
+        stack[i].vnode.componentInstance.$destroy();
+        stack[i] = null;
       }
     }
 
-    stack = (_readOnlyError("stack"), stack[indexToLeave]);
+    stack = stack[indexToLeave];
     window.console.log('[VuePageStack] _clearStack', stack);
 
     if (preventNavigationFlag) {
