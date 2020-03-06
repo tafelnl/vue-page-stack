@@ -122,7 +122,7 @@ function clearStackToFirst(route) {
   return _clearStack(route);
 }
 
-function _clearStack(replaceLeftOverItemWithRoute = null, indexToLeave = 0, preventNavigationFlag = true, replaceHistoryPathFlag = false) {
+function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preventNavigationFlag = true, replaceHistoryPathFlag = false) {
   return new Promise((resolve, reject) => {
     let currentRouteFullPath = (currentRoute) ? currentRoute.fullPath : window.location.href;
     let goBackN = (stack.length) ? stack.length - 1 : 1;
@@ -133,22 +133,20 @@ function _clearStack(replaceLeftOverItemWithRoute = null, indexToLeave = 0, prev
 
 
 
+    window.console.log('[VuePageStack] _clearStack - check', replaceLeftOverItemWithRoute, stack[indexToLeave]);
     // check if currentVnode is the same as this vnode
-    let key = vnode.query[config.keyName];
+    let key = vnode.componentInstance.$route.query[config.keyName];
     let index = getIndexByKey(key);
     window.console.log('[VuePageStack] _clearStack - check diff', index, indexToLeave);
     if (index == indexToLeave) {
       // exactly the same
       window.console.log('[VuePageStack] _clearStack - same same', index, indexToLeave);
-    } else {
+    } else if(replaceLeftOverItemWithRoute.name && stack[indexToLeave].vnode.componentInstance.fixedRoute) {
       // else check if route name is the same
-      if(replaceLeftOverItemWithRoute) {
-        if(replaceLeftOverItemWithRoute.name == stack[indexToLeave].vnode.componentInstance.$options.name) {
-          window.console.log('[VuePageStack] _clearStack - same NAME', replaceLeftOverItemWithRoute.name);
-        }
+      if(replaceLeftOverItemWithRoute.name == stack[indexToLeave].vnode.componentInstance.fixedRoute.name) {
+        window.console.log('[VuePageStack] _clearStack - same NAME', replaceLeftOverItemWithRoute.name);
       }
     }
-
 
 
     // destroy the instances that will be spliced
