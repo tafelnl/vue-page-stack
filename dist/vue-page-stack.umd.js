@@ -2401,7 +2401,7 @@ function clearStackToFirst(route) {
 }
 
 function _clearStack() {
-  var replaceLeftOverItemWithRoute = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var replaceLeftOverItemWithRoute = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var indexToLeave = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
   var preventNavigationFlag = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
   var replaceHistoryPathFlag = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
@@ -2412,22 +2412,21 @@ function _clearStack() {
     if (!goBackN) {
       // @TODO(1)
       return;
-    } // check if currentVnode is the same as this vnode
+    }
 
+    window.console.log('[VuePageStack] _clearStack - check', replaceLeftOverItemWithRoute, stack[indexToLeave]); // check if currentVnode is the same as this vnode
 
-    var key = vnode.query[config.keyName];
+    var key = vnode.componentInstance.$route.query[config.keyName];
     var index = getIndexByKey(key);
     window.console.log('[VuePageStack] _clearStack - check diff', index, indexToLeave);
 
     if (index == indexToLeave) {
       // exactly the same
       window.console.log('[VuePageStack] _clearStack - same same', index, indexToLeave);
-    } else {
+    } else if (replaceLeftOverItemWithRoute.name && stack[indexToLeave].vnode.componentInstance.fixedRoute) {
       // else check if route name is the same
-      if (replaceLeftOverItemWithRoute) {
-        if (replaceLeftOverItemWithRoute.name == stack[indexToLeave].vnode.componentInstance.$options.name) {
-          window.console.log('[VuePageStack] _clearStack - same NAME', replaceLeftOverItemWithRoute.name);
-        }
+      if (replaceLeftOverItemWithRoute.name == stack[indexToLeave].vnode.componentInstance.fixedRoute.name) {
+        window.console.log('[VuePageStack] _clearStack - same NAME', replaceLeftOverItemWithRoute.name);
       }
     } // destroy the instances that will be spliced
 
