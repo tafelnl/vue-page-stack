@@ -2433,11 +2433,16 @@ function _clearStack() {
   var replaceHistoryPathFlag = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
   return new Promise(function (resolve, reject) {
     var currentRouteFullPath = currentRoute ? currentRoute.fullPath : window.location.href;
-    window.console.log('[VuePageStack] _clearStack - check', replaceLeftOverItemWithRoute, stack[indexToLeave]);
+    window.console.log('[VuePageStack] _clearStack - check', currentRouteFullPath);
     var goBackN = stack.length ? stack.length - 1 : 1;
 
     if (!goBackN) {
-      // @TODO(1)
+      if (indexToLeave != 0) {
+        // if current stack item in stack (which can only be index == 0) is not to be leaved, clear whole stack
+        stack = [];
+      }
+
+      resolve();
       return;
     }
 
