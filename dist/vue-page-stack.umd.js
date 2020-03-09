@@ -2312,7 +2312,7 @@ var es6_promise = __webpack_require__("551c");
 var es6_number_constructor = __webpack_require__("c5f6");
 
 // CONCATENATED MODULE: ./src/config/config.js
-/* harmony default export */ var config_config = ({
+/* harmony default export */ var config = ({
   componentName: 'VuePageStack',
   keyName: 'stack-key',
   pushName: 'push',
@@ -2324,7 +2324,7 @@ var es6_number_constructor = __webpack_require__("c5f6");
 // CONCATENATED MODULE: ./src/history.js
 
 var history_history = {
-  action: config_config.pushName
+  action: config.pushName
 };
 /* harmony default export */ var src_history = (history_history);
 // CONCATENATED MODULE: ./src/Utils/HistoryUtils.js
@@ -2421,7 +2421,7 @@ function getIndexByKey(key) {
 
 var VuePageStack_VuePageStack = function VuePageStack(keyName) {
   return {
-    name: config_config.componentName,
+    name: config.componentName,
     abstract: true,
     data: function data() {
       return {};
@@ -2461,7 +2461,7 @@ var VuePageStack_VuePageStack = function VuePageStack(keyName) {
       } else {
         window.console.log('[VuePageStack] render - index === -1');
 
-        if (src_history.action === config_config.replaceName) {
+        if (src_history.action === config.replaceName) {
           // route gets replaced
           // replace stack item with new route
           // first destroy the instance
@@ -2494,7 +2494,7 @@ function _getReplaceWithRoute(indexToPreserve) {
     window.console.error('[VuePageStack] check this');
   }
 
-  var currentKey = vnode && vnode.componentInstance && vnode.componentInstance.$route ? vnode.componentInstance.$route.query[config_config.keyName] : null;
+  var currentKey = vnode && vnode.componentInstance && vnode.componentInstance.$route ? vnode.componentInstance.$route.query[config.keyName] : null;
   var currentIndex = getIndexByKey(currentKey); // probably always the same as (stack.length - 1)
   // first check if indexToPreserve results in the same vnode as the current vnode
 
@@ -2569,20 +2569,20 @@ function _clearStackFinal() {
 }
 
 function _clearHistory(goBackN) {
-  var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   return new Promise(function (resolve) {
     // default config
-    var defaultConfig = {
+    var defaultOptions = {
       preventNavigation: true
-    }; // merge config with defaultConfig
+    }; // merge options with defaultOptions
 
-    Object.assign(defaultConfig, config);
+    Object.assign(defaultOptions, options);
     window.console.log('[VuePageStack] _clearHistory', goBackN);
 
     if (goBackN <= 0) {
-      if (config.replaceWithRoute) {
+      if (defaultOptions.replaceWithRoute) {
         // if replaceWithRoute is defined, replace current route
-        HistoryUtils.replace(config.replaceWithRoute).then(function () {
+        HistoryUtils.replace(defaultOptions.replaceWithRoute).then(function () {
           resolve();
         });
       } else {
@@ -2592,16 +2592,16 @@ function _clearHistory(goBackN) {
       return;
     }
 
-    if (config.preventNavigation) {
+    if (defaultOptions.preventNavigation) {
       // prevents history.go(-goBackN) from triggering VueRouter
       preventNavigation = true;
     } // go back in history
 
 
     HistoryUtils.clearHistory(goBackN).then(function () {
-      if (config.replaceWithRoute) {
+      if (defaultOptions.replaceWithRoute) {
         // if replaceWithRoute is defined, replace current route
-        HistoryUtils.replace(config.replaceWithRoute).then(function () {
+        HistoryUtils.replace(defaultOptions.replaceWithRoute).then(function () {
           resolve();
         });
       } else {
@@ -2716,7 +2716,7 @@ var mixin_eventRegister = function eventRegister(router) {
   var routerForward = router.forward.bind(router);
 
   router.push = function (location, onResolve, onReject) {
-    src_history.action = config_config.pushName;
+    src_history.action = config.pushName;
 
     if (onResolve || onReject) {
       return routerPush(location, onResolve, onReject);
@@ -2730,12 +2730,12 @@ var mixin_eventRegister = function eventRegister(router) {
   };
 
   router.go = function (n) {
-    src_history.action = config_config.goName;
+    src_history.action = config.goName;
     routerGo(n);
   };
 
   router.replace = function (location, onResolve, onReject) {
-    src_history.action = config_config.replaceName;
+    src_history.action = config.replaceName;
 
     if (onResolve || onReject) {
       return routerReplace(location, onResolve, onReject);
@@ -2749,12 +2749,12 @@ var mixin_eventRegister = function eventRegister(router) {
   };
 
   router.back = function () {
-    src_history.action = config_config.backName;
+    src_history.action = config.backName;
     routerBack();
   };
 
   router.forward = function () {
-    src_history.action = config_config.forwardName;
+    src_history.action = config.forwardName;
     routerForward();
   };
 };
@@ -2785,9 +2785,9 @@ var VuePageStackPlugin = {};
 VuePageStackPlugin.install = function (Vue, _ref) {
   var router = _ref.router,
       _ref$name = _ref.name,
-      name = _ref$name === void 0 ? config_config.componentName : _ref$name,
+      name = _ref$name === void 0 ? config.componentName : _ref$name,
       _ref$keyName = _ref.keyName,
-      keyName = _ref$keyName === void 0 ? config_config.keyName : _ref$keyName;
+      keyName = _ref$keyName === void 0 ? config.keyName : _ref$keyName;
 
   if (!router) {
     throw Error('\n vue-router is necessary. \n\n');
@@ -2812,7 +2812,7 @@ VuePageStackPlugin.install = function (Vue, _ref) {
 
     if (!hasKey(to.query, keyName)) {
       to.query[keyName] = getKey('xxxxxxxx');
-      var replace = src_history.action === config_config.replaceName || !hasKey(from.query, keyName);
+      var replace = src_history.action === config.replaceName || !hasKey(from.query, keyName);
       next({
         hash: to.hash,
         path: to.path,
@@ -2826,9 +2826,9 @@ VuePageStackPlugin.install = function (Vue, _ref) {
       var index = getIndexByKey(to.query[keyName]);
 
       if (index === -1) {
-        to.params[keyName + '-dir'] = config_config.forwardName;
+        to.params[keyName + '-dir'] = config.forwardName;
       } else {
-        to.params[keyName + '-dir'] = config_config.backName;
+        to.params[keyName + '-dir'] = config.backName;
       }
 
       next({
