@@ -156,19 +156,19 @@ function _clearStackFinal(indexToPreserve = 0) {
   }
   window.console.log('[VuePageStack] _clearStack - new stack:', stack)
 }
-function _clearHistory(goBackN, config = {}) {
+function _clearHistory(goBackN, options = {}) {
   return new Promise((resolve) => {
     // default config
-    let defaultConfig = {
+    let defaultOptions = {
       preventNavigation: true
     }
-    // merge config with defaultConfig
-    Object.assign(defaultConfig, config);
+    // merge options with defaultOptions
+    Object.assign(defaultOptions, options);
     window.console.log('[VuePageStack] _clearHistory', goBackN);
     if (goBackN <= 0) {
-      if (config.replaceWithRoute) {
+      if (defaultOptions.replaceWithRoute) {
         // if replaceWithRoute is defined, replace current route
-        HistoryUtils.replace(config.replaceWithRoute).then(() => {
+        HistoryUtils.replace(defaultOptions.replaceWithRoute).then(() => {
           resolve();
         });
       } else {
@@ -176,15 +176,15 @@ function _clearHistory(goBackN, config = {}) {
       }
       return;
     }
-    if (config.preventNavigation) {
+    if (defaultOptions.preventNavigation) {
       // prevents history.go(-goBackN) from triggering VueRouter
       preventNavigation = true;
     }
     // go back in history
     HistoryUtils.clearHistory(goBackN).then(() => {
-      if (config.replaceWithRoute) {
+      if (defaultOptions.replaceWithRoute) {
         // if replaceWithRoute is defined, replace current route
-        HistoryUtils.replace(config.replaceWithRoute).then(() => {
+        HistoryUtils.replace(defaultOptions.replaceWithRoute).then(() => {
           resolve();
         });
       } else {
