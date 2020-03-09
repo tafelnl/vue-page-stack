@@ -2417,12 +2417,11 @@ function clearStackToCurrent() {
  * 1. clearStack completely
  * 2. except the first item (first in stack)
  * 3. window.history.go(-goBackN)
- * 4. HistoryUtils.replace(currentRouteFullPath) (to make sure location.reload() will load correct page)
+ * 4. HistoryUtils.replace(replaceLeftOverItemWithRoute) (to make sure location.reload() will load correct page)
  */
 
 
 function clearStackToFirst(route) {
-  var currentRouteFullPath = currentRoute ? currentRoute.fullPath : window.location.href;
   return _clearStack(route);
 }
 
@@ -2437,6 +2436,7 @@ function _clearStack() {
     var goBackN = stack.length ? stack.length - 1 : 1;
 
     if (!goBackN) {
+      // @TODO(1): check if current route name is correct
       if (indexToLeave != 0) {
         // if current stack item in stack (which can only be index == 0) is not to be leaved, clear whole stack
         stack = [];
@@ -2459,6 +2459,10 @@ function _clearStack() {
       // else check if route name is the same
       if (replaceLeftOverItemWithRoute.name == stack[indexToLeave].vnode.componentInstance.fixedRoute.name) {
         window.console.log('[VuePageStack] _clearStack - same NAME', replaceLeftOverItemWithRoute.name);
+      } else {
+        window.console.log('[VuePageStack] _clearStack - different NAME', replaceLeftOverItemWithRoute.name);
+        replaceHistoryPathFlag = true;
+        currentRouteFullPath = replaceLeftOverItemWithRoute.path; // @TODO(1): stack item ook vervangen voor de correcte
       }
     } // destroy the instances that will be spliced
 
@@ -2599,7 +2603,8 @@ VuePageStackPlugin.install = function (Vue, _ref) {
   Vue.component(name, VuePageStack_VuePageStack(keyName));
   Vue.prototype.$pageStack = {
     getStack: getStack,
-    clearStackToCurrent: clearStackToCurrent
+    clearStackToCurrent: clearStackToCurrent,
+    clearStackToFirst: clearStackToFirst
   };
   mixin(router);
 
