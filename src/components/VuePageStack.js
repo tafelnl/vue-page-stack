@@ -63,9 +63,10 @@ let VuePageStack = keyName => {
         // went back in browser history to existing route
         window.console.log('[VuePageStack] render - index !== -1')
         if(!stack[index].vnode) {
-          return vnode;
+          stack[index].vnode = vnode;
+        } else {
+          vnode.componentInstance = stack[index].vnode.componentInstance;
         }
-        vnode.componentInstance = stack[index].vnode.componentInstance;
         // destroy the instances that will be spliced
         for (let i = index + 1; i < stack.length; i++) {
           window.console.log('[VuePageStack] render - $destroy')
