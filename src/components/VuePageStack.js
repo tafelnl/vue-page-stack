@@ -107,7 +107,10 @@ function _getReplaceWithRoute(indexToPreserve, backupRouteObject = {}, shallowCo
   if(indexToPreserve == currentIndex) {
     // exactly the same
     // nothing to fear
-    return vnode.componentInstance.$route.fullPath;
+
+    // dit is niet betrouwbaar want als je een indexToPreserve == 0 is, en je huidige pagina is, en die bestaat, dan zal dit altijd true zijn
+    // uitgeschakeld voor nu, totdat ik een betere optie weet te ontdekken
+    // return vnode.componentInstance.$route.fullPath;
   }
   let componentToPreserve = stack[indexToPreserve].vnode.componentInstance;
   window.console.error('[VuePageStack] _getReplaceWithRoute - componentToPreserve', componentToPreserve);
