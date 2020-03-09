@@ -2442,10 +2442,11 @@ var VuePageStack_VuePageStack = function VuePageStack(keyName) {
         window.console.log('[VuePageStack] render - index !== -1');
 
         if (!stack[index].vnode) {
-          return vnode;
-        }
+          stack[index].vnode = vnode;
+        } else {
+          vnode.componentInstance = stack[index].vnode.componentInstance;
+        } // destroy the instances that will be spliced
 
-        vnode.componentInstance = stack[index].vnode.componentInstance; // destroy the instances that will be spliced
 
         for (var i = index + 1; i < stack.length; i++) {
           window.console.log('[VuePageStack] render - $destroy');
