@@ -111,10 +111,9 @@ function clearStackToCurrent() {
  * 1. clearStack completely
  * 2. except the first item (first in stack)
  * 3. window.history.go(-goBackN)
- * 4. HistoryUtils.replace(currentRouteFullPath) (to make sure location.reload() will load correct page)
+ * 4. HistoryUtils.replace(replaceLeftOverItemWithRoute) (to make sure location.reload() will load correct page)
  */
 function clearStackToFirst(route) {
-  let currentRouteFullPath = (currentRoute) ? currentRoute.fullPath : window.location.href;
   return _clearStack(route);
 }
 
@@ -124,6 +123,7 @@ function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preven
     window.console.log('[VuePageStack] _clearStack - check', currentRouteFullPath);
     let goBackN = (stack.length) ? stack.length - 1 : 1;
     if (!goBackN) {
+      // @TODO(1): check if current route name is correct
       if (indexToLeave != 0) {
         // if current stack item in stack (which can only be index == 0) is not to be leaved, clear whole stack
         stack = [];
@@ -146,6 +146,11 @@ function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preven
       // else check if route name is the same
       if (replaceLeftOverItemWithRoute.name == stack[indexToLeave].vnode.componentInstance.fixedRoute.name) {
         window.console.log('[VuePageStack] _clearStack - same NAME', replaceLeftOverItemWithRoute.name);
+      } else {
+        window.console.log('[VuePageStack] _clearStack - different NAME', replaceLeftOverItemWithRoute.name);
+        replaceHistoryPathFlag = true;
+        currentRouteFullPath = replaceLeftOverItemWithRoute.path;
+        // @TODO(1): stack item ook vervangen voor de correcte
       }
     }
 
@@ -191,4 +196,4 @@ function setPreventNavigation(value) {
   return preventNavigation = value;
 }
 
-export { VuePageStack, getIndexByKey, getStack, clearStackToCurrent, getPreventNavigation, setPreventNavigation };
+export { VuePageStack, getIndexByKey, getStack, clearStackToCurrent, clearStackToFirst, getPreventNavigation, setPreventNavigation };
