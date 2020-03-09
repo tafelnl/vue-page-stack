@@ -103,12 +103,14 @@ function _getReplaceWithRoute(indexToPreserve, backupRouteObject = {}, shallowCo
   let currentKey = (vnode && vnode.componentInstance && vnode.componentInstance.$route) ? vnode.componentInstance.$route.query[config.keyName] : null;
   let currentIndex = getIndexByKey(currentKey); // probably always the same as (stack.length - 1)
   // first check if indexToPreserve results in the same vnode as the current vnode
+  window.console.error('[VuePageStack] _getReplaceWithRoute - currentKey', currentKey, currentIndex);
   if(indexToPreserve == currentIndex) {
     // exactly the same
     // nothing to fear
     return vnode.componentInstance.$route.fullPath;
   }
   let componentToPreserve = stack[indexToPreserve].vnode.componentInstance;
+  window.console.error('[VuePageStack] _getReplaceWithRoute - componentToPreserve', componentToPreserve);
   // else check if backupRouteObject is defined and componentToPreserve.fixedRoute is defined
   if ((backupRouteObject.name || backupRouteObject.fullPath) && componentToPreserve.fixedRoute) {
     // first check if backupRouteObject.fullPath equals componentToPreserve.fixedRoute.fullPath
@@ -176,7 +178,7 @@ function _clearHistory(goBackN, options = {}) {
     }
     // merge options with defaultOptions
     Object.assign(defaultOptions, options);
-    window.console.log('[VuePageStack] _clearHistory', goBackN);
+    window.console.log('[VuePageStack] _clearHistory', goBackN, defaultOptions);
     if (goBackN <= 0) {
       if (defaultOptions.replaceWithRoute) {
         // if replaceWithRoute is defined, replace current route
