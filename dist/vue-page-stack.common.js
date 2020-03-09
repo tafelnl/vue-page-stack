@@ -2507,7 +2507,7 @@ function _getReplaceWithRoute(indexToPreserve) {
 
 
     if (shallowCompare) {
-      if (backupRouteObject.name == componentToPreserve.fixedRoute) {
+      if (backupRouteObject.name == componentToPreserve.fixedRoute.name) {
         // the name of the routes are the same
         // probably nothing to fear
         return componentToPreserve.fixedRoute.fullPath;
@@ -2687,6 +2687,10 @@ function getStack() {
   return stack;
 }
 
+function setStack(value) {
+  return stack = value;
+}
+
 function getPreventNavigation() {
   return preventNavigation;
 }
@@ -2789,6 +2793,7 @@ VuePageStackPlugin.install = function (Vue, _ref) {
   Vue.component(name, VuePageStack_VuePageStack(keyName));
   Vue.prototype.$pageStack = {
     getStack: getStack,
+    setStack: setStack,
     clearStackToCurrent: clearStackToCurrent,
     clearStackToFirst: clearStackToFirst
   };
