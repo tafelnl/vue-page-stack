@@ -91,7 +91,7 @@ let VuePageStack = keyName => {
   };
 };
 
-function getReplaceWithRoute(indexToPreserve, backupRouteObject = {}, shallowCompare = true) {
+function _getReplaceWithRoute(indexToPreserve, backupRouteObject = {}, shallowCompare = true) {
   if(!stack[indexToPreserve]) {
     // @TOOD(1): still need to decide what to do
     window.console.error('[VuePageStack] check this');
@@ -137,86 +137,12 @@ function _clearStack(indexToPreserve = 0, replaceWithRoute = null) {
     replaceWithRoute: replaceWithRoute
   });
 }
-
-/**
- * clearStackToFirst()
- * 1. clearStack completely
- * 2. except the first item (first in stack)
- * 3. window.history.go(-goBackN)
- * 4. HistoryUtils.replace(replaceLeftOverItemWithRoute) (to make sure location.reload() will load correct page)
- */
-function clearStackToFirst(route) {
-  let indexToPreserve = 0;
-  let replaceWithRoute = getReplaceWithRoute(indexToPreserve, route.route);
-  _clearStack(indexToPreserve, replaceWithRoute);
-}
-
-/**
- * clearStackToCurrent()
- * Works as follows:
- * 1. clearStack completely
- * 2. except the current item (last in stack)
- * 3. window.history.go(-goBackN)
- * 4. HistoryUtils.replace(currentRouteFullPath) (to make sure location.reload() will load correct page)
- */
-function clearStackToCurrent() {
-  let indexToPreserve = stack.length - 1;
-  let replaceWithRoute = getReplaceWithRoute(indexToPreserve, vnode.componentInstance.$route);
-  _clearStack(indexToPreserve, replaceWithRoute);
-}
-
-// function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preventNavigationFlag = true, replaceHistoryPathFlag = false) {
-//   return new Promise((resolve, reject) => {
-//     let currentRouteFullPath = (currentRoute) ? currentRoute.fullPath : window.location.href;
-//     window.console.log('[VuePageStack] _clearStack - check', currentRouteFullPath);
-//     let goBackN = (stack.length) ? stack.length - 1 : 1;
-//     if (!goBackN) {
-//       // @TODO(1): check if current route name is correct
-//       if (indexToLeave != 0) {
-//         // if current stack item in stack (which can only be index == 0) is not to be leaved, clear whole stack
-//         stack = [];
-//       }
-//       resolve();
-//       return;
-//     }
-//
-//
-//
-//     window.console.log('[VuePageStack] _clearStack - check', replaceLeftOverItemWithRoute, stack[indexToLeave]);
-//     // check if currentVnode is the same as this vnode
-//     let key = vnode.componentInstance.$route.query[config.keyName];
-//     let index = getIndexByKey(key);
-//     window.console.log('[VuePageStack] _clearStack - check diff', index, indexToLeave);
-//     if (index == indexToLeave) {
-//       // exactly the same
-//       window.console.log('[VuePageStack] _clearStack - same same', index, indexToLeave);
-//     } else if (replaceLeftOverItemWithRoute.name && stack[indexToLeave].vnode.componentInstance.fixedRoute) {
-//       // else check if route name is the same
-//       if (replaceLeftOverItemWithRoute.name == stack[indexToLeave].vnode.componentInstance.fixedRoute.name) {
-//         window.console.log('[VuePageStack] _clearStack - same NAME', replaceLeftOverItemWithRoute.name);
-//       } else {
-//         window.console.log('[VuePageStack] _clearStack - different NAME', replaceLeftOverItemWithRoute.name);
-//         replaceHistoryPathFlag = true;
-//         currentRouteFullPath = replaceLeftOverItemWithRoute.path;
-//         // @TODO(1): stack item ook vervangen voor de correcte
-//       }
-//     }
-//
-//
-//     _clearStackFinal(indexToLeave);
-//
-//     _clearHistory(goBackN, {
-//       preventNavigation: preventNavigationFlag,
-//       replaceWithRoute: (replaceHistoryPathFlag) ? currentRouteFullPath : null
-//     });
-//   });
-// }
 function _clearStackFinal(indexToPreserve = 0) {
   // destroy all the instances in stack
   // except the one that should be preserved
   for (let i = 0; i < stack.length; i++) {
     if (i != indexToPreserve) {
-      window.console.log('[VuePageStack] _clearStack - $destroy', stack[i]);
+      window.console.log('[VuePageStack] _clearStack - $destroy', i, stack[i]);
       stack[i].vnode.componentInstance.$destroy();
       stack[i] = null;
     }
@@ -267,6 +193,80 @@ function _clearHistory(goBackN, config = {}) {
     });
   });
 }
+
+/**
+ * clearStackToFirst()
+ * 1. clearStack completely
+ * 2. except the first item (first in stack)
+ * 3. window.history.go(-goBackN)
+ * 4. HistoryUtils.replace(replaceLeftOverItemWithRoute) (to make sure location.reload() will load correct page)
+ */
+function clearStackToFirst(route) {
+  let indexToPreserve = 0;
+  let replaceWithRoute = _getReplaceWithRoute(indexToPreserve, route.route);
+  return _clearStack(indexToPreserve, replaceWithRoute);
+}
+
+/**
+ * clearStackToCurrent()
+ * Works as follows:
+ * 1. clearStack completely
+ * 2. except the current item (last in stack)
+ * 3. window.history.go(-goBackN)
+ * 4. HistoryUtils.replace(currentRouteFullPath) (to make sure location.reload() will load correct page)
+ */
+function clearStackToCurrent() {
+  let indexToPreserve = stack.length - 1;
+  let replaceWithRoute = _getReplaceWithRoute(indexToPreserve, vnode.componentInstance.$route);
+  return _clearStack(indexToPreserve, replaceWithRoute);
+}
+
+// function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preventNavigationFlag = true, replaceHistoryPathFlag = false) {
+//   return new Promise((resolve, reject) => {
+//     let currentRouteFullPath = (currentRoute) ? currentRoute.fullPath : window.location.href;
+//     window.console.log('[VuePageStack] _clearStack - check', currentRouteFullPath);
+//     let goBackN = (stack.length) ? stack.length - 1 : 1;
+//     if (!goBackN) {
+//       // @TODO(1): check if current route name is correct
+//       if (indexToLeave != 0) {
+//         // if current stack item in stack (which can only be index == 0) is not to be leaved, clear whole stack
+//         stack = [];
+//       }
+//       resolve();
+//       return;
+//     }
+//
+//
+//
+//     window.console.log('[VuePageStack] _clearStack - check', replaceLeftOverItemWithRoute, stack[indexToLeave]);
+//     // check if currentVnode is the same as this vnode
+//     let key = vnode.componentInstance.$route.query[config.keyName];
+//     let index = getIndexByKey(key);
+//     window.console.log('[VuePageStack] _clearStack - check diff', index, indexToLeave);
+//     if (index == indexToLeave) {
+//       // exactly the same
+//       window.console.log('[VuePageStack] _clearStack - same same', index, indexToLeave);
+//     } else if (replaceLeftOverItemWithRoute.name && stack[indexToLeave].vnode.componentInstance.fixedRoute) {
+//       // else check if route name is the same
+//       if (replaceLeftOverItemWithRoute.name == stack[indexToLeave].vnode.componentInstance.fixedRoute.name) {
+//         window.console.log('[VuePageStack] _clearStack - same NAME', replaceLeftOverItemWithRoute.name);
+//       } else {
+//         window.console.log('[VuePageStack] _clearStack - different NAME', replaceLeftOverItemWithRoute.name);
+//         replaceHistoryPathFlag = true;
+//         currentRouteFullPath = replaceLeftOverItemWithRoute.path;
+//         // @TODO(1): stack item ook vervangen voor de correcte
+//       }
+//     }
+//
+//
+//     _clearStackFinal(indexToLeave);
+//
+//     _clearHistory(goBackN, {
+//       preventNavigation: preventNavigationFlag,
+//       replaceWithRoute: (replaceHistoryPathFlag) ? currentRouteFullPath : null
+//     });
+//   });
+// }
 
 function getStack() {
   return stack;
