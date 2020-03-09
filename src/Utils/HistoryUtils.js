@@ -1,5 +1,16 @@
 export default {
 
+  clearHistory(goBackN) {
+    return new Promise((resolve) => {
+      window.history.go(-goBackN);
+      // timeout needed to let window.history.go(-goBackN); finish first
+      // timeout needs to be greater than 0 milliseconds
+      setTimeout(() => {
+        resolve();
+      }, 10);
+    });
+  },
+
   push (url) {
     return this._push(url);
   },
