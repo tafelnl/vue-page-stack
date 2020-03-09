@@ -115,7 +115,7 @@ function _getReplaceWithRoute(indexToPreserve, backupRouteObject = {}, shallowCo
     }
     // if shallowCompare is allowed then check if backupRouteObject.name equals componentToPreserve.fixedRoute.name
     if(shallowCompare) {
-      if (backupRouteObject.name == componentToPreserve.fixedRoute) {
+      if (backupRouteObject.name == componentToPreserve.fixedRoute.name) {
         // the name of the routes are the same
         // probably nothing to fear
         return componentToPreserve.fixedRoute.fullPath;
