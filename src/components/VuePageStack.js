@@ -273,6 +273,9 @@ function clearStackToCurrent() {
 function getStack() {
   return stack;
 }
+function setStack(value) {
+  return stack = value;
+}
 function getPreventNavigation() {
   return preventNavigation;
 }
@@ -280,4 +283,4 @@ function setPreventNavigation(value) {
   return preventNavigation = value;
 }
 
-export { VuePageStack, getIndexByKey, getStack, clearStackToCurrent, clearStackToFirst, getPreventNavigation, setPreventNavigation };
+export { VuePageStack, getIndexByKey, getStack, setStack, clearStackToCurrent, clearStackToFirst, getPreventNavigation, setPreventNavigation };
