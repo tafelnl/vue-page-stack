@@ -2250,7 +2250,48 @@ var history_history = {
   action: config.pushName
 };
 /* harmony default export */ var src_history = (history_history);
+// CONCATENATED MODULE: ./src/Utils/HistoryUtils.js
+
+/* harmony default export */ var HistoryUtils = ({
+  push: function push(url) {
+    return this._push(url);
+  },
+  _push: function _push(url) {
+    var replace = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    return new Promise(function (resolve) {
+      // try...catch the pushState call to get around Safari
+      // DOM Exception 18 where it limits to 100 pushState calls
+      var history = window.history;
+
+      var _key = window.performance.now().toFixed(3);
+
+      try {
+        if (replace) {
+          history.replaceState({
+            key: _key
+          }, '', url);
+        } else {
+          history.pushState({
+            key: _key
+          }, '', url);
+        }
+      } catch (e) {
+        window.location[replace ? 'replace' : 'assign'](url);
+      } // setTimeout needed to let pushState() finish first
+
+
+      setTimeout(function () {
+        resolve();
+      }, 10);
+    });
+  },
+  replace: function replace(url) {
+    return this._push(url, true);
+  }
+});
 // CONCATENATED MODULE: ./src/components/VuePageStack.js
+
+
 
 
 
@@ -2392,6 +2433,7 @@ function _clearStack() {
   var replaceHistoryPathFlag = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
   return new Promise(function (resolve, reject) {
     var currentRouteFullPath = currentRoute ? currentRoute.fullPath : window.location.href;
+    window.console.log('[VuePageStack] _clearStack - check', replaceLeftOverItemWithRoute, stack[indexToLeave]);
     var goBackN = stack.length ? stack.length - 1 : 1;
 
     if (!goBackN) {
@@ -2435,10 +2477,13 @@ function _clearStack() {
 
     setTimeout(function () {
       if (replaceHistoryPathFlag) {
-        window.console.log('[VuePageStack] _clearStack - replaceHistoryPathFlag');
+        HistoryUtils.replace(currentRouteFullPath).then(function () {
+          window.console.log('[VuePageStack] _clearStack - replaceHistoryPathFlag');
+          resolve();
+        });
+      } else {
+        resolve();
       }
-
-      resolve();
     }, 10);
   });
 }
