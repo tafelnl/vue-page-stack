@@ -20,7 +20,7 @@ function getFirstComponentChild(children) {
   }
 }
 
-let stack = [];
+var stack = [];
 
 let preventNavigation = false;
 let currentRoute = null;
@@ -57,11 +57,6 @@ let VuePageStack = keyName => {
       vnode = getFirstComponentChild(slot);
       window.console.log('[VuePageStack] render', stack, vnode)
       if (!vnode) {
-        return vnode;
-      }
-      if(preventNavigation) {
-        window.console.log('[VuePageStack] preventNavigation')
-        preventNavigation = false;
         return vnode;
       }
       let index = getIndexByKey(key);
@@ -157,7 +152,7 @@ function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preven
         stack[i] = null;
       }
     }
-    stack = stack[indexToLeave];
+    stack = [stack[indexToLeave]];
     window.console.log('[VuePageStack] _clearStack', stack)
 
     if(preventNavigationFlag) {
