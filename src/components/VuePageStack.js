@@ -121,10 +121,14 @@ function clearStackToFirst(route) {
 function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preventNavigationFlag = true, replaceHistoryPathFlag = false) {
   return new Promise((resolve, reject) => {
     let currentRouteFullPath = (currentRoute) ? currentRoute.fullPath : window.location.href;
-    window.console.log('[VuePageStack] _clearStack - check', replaceLeftOverItemWithRoute, stack[indexToLeave]);
+    window.console.log('[VuePageStack] _clearStack - check', currentRouteFullPath);
     let goBackN = (stack.length) ? stack.length - 1 : 1;
     if(!goBackN) {
-      // @TODO(1)
+      if(indexToLeave != 0) {
+        // if current stack item in stack (which can only be index == 0) is not to be leaved, clear whole stack
+        stack = [];
+      }
+      resolve();
       return;
     }
 
