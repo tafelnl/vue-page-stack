@@ -1,4 +1,5 @@
 import history from '../history';
+import HistoryUtils from '../Utils/HistoryUtils';
 import config from '../config/config';
 
 function isDef(v) {
@@ -120,6 +121,7 @@ function clearStackToFirst(route) {
 function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preventNavigationFlag = true, replaceHistoryPathFlag = false) {
   return new Promise((resolve, reject) => {
     let currentRouteFullPath = (currentRoute) ? currentRoute.fullPath : window.location.href;
+    window.console.log('[VuePageStack] _clearStack - check', replaceLeftOverItemWithRoute, stack[indexToLeave]);
     let goBackN = (stack.length) ? stack.length - 1 : 1;
     if(!goBackN) {
       // @TODO(1)
@@ -164,9 +166,13 @@ function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preven
     // timeout needed to let window.history.go(-goBackN); finish first
     setTimeout(() => {
       if(replaceHistoryPathFlag) {
-        window.console.log('[VuePageStack] _clearStack - replaceHistoryPathFlag')
+        HistoryUtils.replace(currentRouteFullPath).then(() => {
+          window.console.log('[VuePageStack] _clearStack - replaceHistoryPathFlag')
+          resolve();
+        });
+      } else {
+        resolve();
       }
-      resolve();
     }, 10);
   });
 }
