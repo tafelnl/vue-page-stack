@@ -2317,12 +2317,6 @@ var VuePageStack_VuePageStack = function VuePageStack(keyName) {
         return vnode;
       }
 
-      if (preventNavigation) {
-        window.console.log('[VuePageStack] preventNavigation');
-        preventNavigation = false;
-        return vnode;
-      }
-
       var index = getIndexByKey(key);
 
       if (index !== -1) {
@@ -2430,7 +2424,7 @@ function _clearStack() {
       }
     }
 
-    stack = stack[indexToLeave];
+    stack = [stack[indexToLeave]];
     window.console.log('[VuePageStack] _clearStack', stack);
 
     if (preventNavigationFlag) {
