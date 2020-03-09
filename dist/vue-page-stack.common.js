@@ -2509,7 +2509,7 @@ function _getReplaceWithRoute(indexToPreserve) {
     if (shallowCompare) {
       if (backupRouteObject.name == componentToPreserve.fixedRoute.name) {
         // the name of the routes are the same
-        // probably nothing to fear
+        // PROBABLY nothing to fear
         return componentToPreserve.fixedRoute.fullPath;
       }
     }
@@ -2519,10 +2519,17 @@ function _getReplaceWithRoute(indexToPreserve) {
   // that is no good
   // therefore we first need to replace the stack[indexToPreserve] with a new item
   // @TODO(1)
-  // stack[indexToPreserve].vnode = null;
-  // then return the backupRouteObject.fullPath
 
-  return backupRouteObject.fullPath;
+  stack[indexToPreserve].vnode.componentInstance.$destroy();
+  stack[indexToPreserve].vnode = null; // then return the backupRouteObject.fullPath
+
+  window.console.error('[VuePageStack] _getReplaceWithRoute', stack[indexToPreserve].key, backupRouteObject.query[keyName]);
+
+  if (stack[indexToPreserve].key == backupRouteObject.query[keyName]) {
+    return backupRouteObject.fullPath;
+  } else {
+    return backupRouteObject.fullPath + "?query[keyName]=".concat(stack[indexToPreserve].key);
+  }
 }
 
 function _clearStack() {
