@@ -123,8 +123,8 @@ function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preven
     let currentRouteFullPath = (currentRoute) ? currentRoute.fullPath : window.location.href;
     window.console.log('[VuePageStack] _clearStack - check', currentRouteFullPath);
     let goBackN = (stack.length) ? stack.length - 1 : 1;
-    if(!goBackN) {
-      if(indexToLeave != 0) {
+    if (!goBackN) {
+      if (indexToLeave != 0) {
         // if current stack item in stack (which can only be index == 0) is not to be leaved, clear whole stack
         stack = [];
       }
@@ -142,9 +142,9 @@ function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preven
     if (index == indexToLeave) {
       // exactly the same
       window.console.log('[VuePageStack] _clearStack - same same', index, indexToLeave);
-    } else if(replaceLeftOverItemWithRoute.name && stack[indexToLeave].vnode.componentInstance.fixedRoute) {
+    } else if (replaceLeftOverItemWithRoute.name && stack[indexToLeave].vnode.componentInstance.fixedRoute) {
       // else check if route name is the same
-      if(replaceLeftOverItemWithRoute.name == stack[indexToLeave].vnode.componentInstance.fixedRoute.name) {
+      if (replaceLeftOverItemWithRoute.name == stack[indexToLeave].vnode.componentInstance.fixedRoute.name) {
         window.console.log('[VuePageStack] _clearStack - same NAME', replaceLeftOverItemWithRoute.name);
       }
     }
@@ -152,7 +152,7 @@ function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preven
 
     // destroy the instances that will be spliced
     for (let i = 0; i < stack.length; i++) {
-      if(i != indexToLeave) {
+      if (i != indexToLeave) {
         window.console.log('[VuePageStack] _clearStack - $destroy', stack[i]);
         stack[i].vnode.componentInstance.$destroy();
         stack[i] = null;
@@ -161,7 +161,7 @@ function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preven
     stack = [stack[indexToLeave]];
     window.console.log('[VuePageStack] _clearStack', stack)
 
-    if(preventNavigationFlag) {
+    if (preventNavigationFlag) {
       preventNavigation = true;
     }
 
@@ -169,7 +169,7 @@ function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preven
 
     // timeout needed to let window.history.go(-goBackN); finish first
     setTimeout(() => {
-      if(replaceHistoryPathFlag) {
+      if (replaceHistoryPathFlag) {
         HistoryUtils.replace(currentRouteFullPath).then(() => {
           window.console.log('[VuePageStack] _clearStack - replaceHistoryPathFlag')
           resolve();
