@@ -2515,7 +2515,7 @@ function _getReplaceWithRoute(indexToPreserve) {
     }
   }
 
-  window.console.error('[VuePageStack] _getReplaceWithRoute', stack, indexToPreserve, backupRouteObject, vnode.componentInstance.$route, shallowCompare); // if we have come this far, there is no such component known in the stack
+  window.console.error('[VuePageStack] _getReplaceWithRoute', stack, indexToPreserve, backupRouteObject, componentToPreserve.fixedRoute, vnode.componentInstance.$route, shallowCompare); // if we have come this far, there is no such component known in the stack
   // that is no good
   // therefore we first need to replace the stack[indexToPreserve] with a new item
   // @TODO(1)
