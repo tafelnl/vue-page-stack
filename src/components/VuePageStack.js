@@ -75,9 +75,9 @@ let VuePageStack = keyName => {
         }
         stack.splice(index + 1);
       } else {
-        window.console.log('[VuePageStack] render - index === -1')
-        if (history.action === config.replaceName) {
-          // route gets replaced
+        window.console.log('[VuePageStack] render - index === -1', history.action)
+        if (history.action === config.replaceName || history.action === config.backName) {
+          // got to this route by either replacing the route or going back in history
           // replace stack item with new route
           // first destroy the instance
           window.console.log('[VuePageStack] render - $destroy')
@@ -288,9 +288,6 @@ function clearStackToCurrent() {
 function getStack() {
   return stack;
 }
-function setStack(value) {
-  return stack = value;
-}
 function getPreventNavigation() {
   return preventNavigation;
 }
@@ -298,4 +295,4 @@ function setPreventNavigation(value) {
   return preventNavigation = value;
 }
 
-export { VuePageStack, getIndexByKey, getStack, setStack, clearStackToCurrent, clearStackToFirst, getPreventNavigation, setPreventNavigation };
+export { VuePageStack, getIndexByKey, getStack, clearStackToCurrent, clearStackToFirst, getPreventNavigation, setPreventNavigation };
