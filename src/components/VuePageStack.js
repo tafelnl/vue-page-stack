@@ -76,7 +76,7 @@ let VuePageStack = keyName => {
         stack.splice(index + 1);
       } else {
         window.console.log('[VuePageStack] render - index === -1', history.action)
-        if (history.action === config.replaceName || history.action === config.backName) {
+        if (history.action === config.replaceName || history.action === config.backName || history.action === config.goName) {
           // got to this route by either replacing the route or going back in history
           // replace stack item with new route
           // first destroy the instance
