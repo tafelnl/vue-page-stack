@@ -2458,7 +2458,7 @@ var VuePageStack_VuePageStack = function VuePageStack(keyName) {
       } else {
         window.console.log('[VuePageStack] render - index === -1', src_history.action);
 
-        if (src_history.action === config.replaceName || src_history.action === config.backName) {
+        if (src_history.action === config.replaceName || src_history.action === config.backName || src_history.action === config.goName) {
           // got to this route by either replacing the route or going back in history
           // replace stack item with new route
           // first destroy the instance
