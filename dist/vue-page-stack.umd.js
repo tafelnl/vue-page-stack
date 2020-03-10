@@ -2465,10 +2465,10 @@ var VuePageStack_VuePageStack = function VuePageStack(keyName) {
 
         stack.splice(index + 1);
       } else {
-        window.console.log('[VuePageStack] render - index === -1');
+        window.console.log('[VuePageStack] render - index === -1', src_history.action);
 
-        if (src_history.action === config.replaceName) {
-          // route gets replaced
+        if (src_history.action === config.replaceName || src_history.action === config.backName) {
+          // got to this route by either replacing the route or going back in history
           // replace stack item with new route
           // first destroy the instance
           window.console.log('[VuePageStack] render - $destroy');
@@ -2713,10 +2713,6 @@ function getStack() {
   return stack;
 }
 
-function setStack(value) {
-  return stack = value;
-}
-
 function getPreventNavigation() {
   return preventNavigation;
 }
@@ -2819,7 +2815,6 @@ VuePageStackPlugin.install = function (Vue, _ref) {
   Vue.component(name, VuePageStack_VuePageStack(keyName));
   Vue.prototype.$pageStack = {
     getStack: getStack,
-    setStack: setStack,
     clearStackToCurrent: clearStackToCurrent,
     clearStackToFirst: clearStackToFirst
   };
