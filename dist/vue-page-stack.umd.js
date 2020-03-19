@@ -2374,6 +2374,23 @@ var history_history = {
   },
   replace: function replace(url) {
     return this._push(url, true);
+  },
+  back: function back() {
+    return new Promise(function (resolve, reject) {
+      var oldCurrentUrl = window.location.href;
+      window.history.back(); // setTimeout needed to let back() finish first
+
+      setTimeout(function () {
+        var newCurrentUrl = window.location.href;
+
+        if (oldCurrentUrl == newCurrentUrl) {
+          // uhoh, probably did not went back in the history
+          reject();
+        } else {
+          resolve();
+        }
+      }, 10);
+    });
   }
 });
 // CONCATENATED MODULE: ./src/components/VuePageStack.js
@@ -2459,7 +2476,11 @@ var VuePageStack_VuePageStack = function VuePageStack(keyName) {
 
         for (var i = index + 1; i < stack.length; i++) {
           window.console.log('[VuePageStack] render - $destroy');
-          stack[i].vnode.componentInstance.$destroy();
+
+          if (stack[i].vnode && stack[i].vnode.componentInstance) {
+            stack[i].vnode.componentInstance.$destroy();
+          }
+
           stack[i] = null;
         }
 
@@ -2472,7 +2493,11 @@ var VuePageStack_VuePageStack = function VuePageStack(keyName) {
           // replace stack item with new route
           // first destroy the instance
           window.console.log('[VuePageStack] render - $destroy');
-          stack[stack.length - 1].vnode.componentInstance.$destroy();
+
+          if (stack[stack.length - 1].vnode && stack[stack.length - 1].vnode.componentInstance) {
+            stack[stack.length - 1].vnode.componentInstance.$destroy();
+          }
+
           stack[stack.length - 1] = null; // then remove fram stack
 
           stack.splice(stack.length - 1);
@@ -2481,7 +2506,8 @@ var VuePageStack_VuePageStack = function VuePageStack(keyName) {
 
         stack.push({
           key: key,
-          vnode: vnode
+          vnode: vnode,
+          routeObject: this.$route
         });
       }
 
@@ -2537,7 +2563,6 @@ function _getReplaceWithRoute(indexToPreserve) {
   window.console.error('[VuePageStack] _getReplaceWithRoute', stack, indexToPreserve, backupRouteObject, componentToPreserve.fixedRoute, vnode.componentInstance.$route, shallowCompare); // if we have come this far, there is no such component known in the stack
   // that is no good
   // therefore we first need to replace the stack[indexToPreserve] with a new item
-  // @TODO(1)
 
   stack[indexToPreserve].vnode.componentInstance.$destroy();
   stack[indexToPreserve].vnode = null; // then return the backupRouteObject.fullPath
@@ -2545,8 +2570,12 @@ function _getReplaceWithRoute(indexToPreserve) {
   window.console.error('[VuePageStack] _getReplaceWithRoute', stack[indexToPreserve].key, backupRouteObject.query[config.keyName]);
 
   if (stack[indexToPreserve].key == backupRouteObject.query[config.keyName]) {
+    stack[indexToPreserve].routeObject = backupRouteObject;
     return backupRouteObject.fullPath;
   } else {
+    // @TODO(1): fullpath kan all ?query= achtig iets bevatten, dus dan is dit niet waterdicht
+    backupRouteObject.query[config.keyName] = stack[indexToPreserve].key;
+    stack[indexToPreserve].routeObject = backupRouteObject;
     return backupRouteObject.fullPath + "?".concat([config.keyName], "=").concat(stack[indexToPreserve].key);
   }
 }
@@ -2571,7 +2600,11 @@ function _clearStackFinal() {
   for (var i = 0; i < stack.length; i++) {
     if (i != indexToPreserve) {
       window.console.log('[VuePageStack] _clearStack - $destroy', i, stack[i]);
-      stack[i].vnode.componentInstance.$destroy();
+
+      if (stack[i].vnode && stack[i].vnode.componentInstance) {
+        stack[i].vnode.componentInstance.$destroy();
+      }
+
       stack[i] = null;
     }
   }
@@ -2661,6 +2694,29 @@ function clearStackToCurrent() {
   var replaceWithRoute = _getReplaceWithRoute(indexToPreserve, vnode.componentInstance.$route);
 
   return _clearStack(indexToPreserve, replaceWithRoute);
+}
+
+function back() {
+  var compareToRoute = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var strict = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  var routeObject = compareToRoute && compareToRoute.route ? compareToRoute.route : null;
+  return new Promise(function (resolve, reject) {
+    if (strict) {
+      // check if a previous route is known
+      if (stack.length <= 1) {
+        // no previous route known
+        return reject();
+      }
+
+      if (routeObject) {
+        if (stack[stack.length - 2].routeObject.name != routeObject.name) {
+          return reject();
+        }
+      }
+    }
+
+    HistoryUtils.back().then(resolve()).catch(reject());
+  });
 } // function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preventNavigationFlag = true, replaceHistoryPathFlag = false) {
 //   return new Promise((resolve, reject) => {
 //     let currentRouteFullPath = (currentRoute) ? currentRoute.fullPath : window.location.href;
