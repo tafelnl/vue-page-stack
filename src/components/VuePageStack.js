@@ -70,7 +70,9 @@ let VuePageStack = keyName => {
         // destroy the instances that will be spliced
         for (let i = index + 1; i < stack.length; i++) {
           window.console.log('[VuePageStack] render - $destroy')
-          stack[i].vnode.componentInstance.$destroy();
+          if(stack[i].vnode && stack[i].vnode.componentInstance) {
+            stack[i].vnode.componentInstance.$destroy();
+          }
           stack[i] = null;
         }
         stack.splice(index + 1);
@@ -81,13 +83,15 @@ let VuePageStack = keyName => {
           // replace stack item with new route
           // first destroy the instance
           window.console.log('[VuePageStack] render - $destroy')
-          stack[stack.length - 1].vnode.componentInstance.$destroy();
+          if(stack[stack.length - 1].vnode && stack[stack.length - 1].vnode.componentInstance) {
+            stack[stack.length - 1].vnode.componentInstance.$destroy();
+          }
           stack[stack.length - 1] = null;
           // then remove fram stack
           stack.splice(stack.length - 1);
         }
         // add new route to stack
-        stack.push({ key, vnode });
+        stack.push({ key, vnode, routeObject: this.$route });
       }
       vnode.data.keepAlive = true;
       return vnode;
@@ -135,14 +139,17 @@ function _getReplaceWithRoute(indexToPreserve, backupRouteObject = {}, shallowCo
   // if we have come this far, there is no such component known in the stack
   // that is no good
   // therefore we first need to replace the stack[indexToPreserve] with a new item
-  // @TODO(1)
   stack[indexToPreserve].vnode.componentInstance.$destroy();
   stack[indexToPreserve].vnode = null;
   // then return the backupRouteObject.fullPath
   window.console.error('[VuePageStack] _getReplaceWithRoute', stack[indexToPreserve].key, backupRouteObject.query[config.keyName]);
   if(stack[indexToPreserve].key == backupRouteObject.query[config.keyName]) {
+    stack[indexToPreserve].routeObject = backupRouteObject;
     return backupRouteObject.fullPath;
   } else {
+    // @TODO(1): fullpath kan all ?query= achtig iets bevatten, dus dan is dit niet waterdicht
+    backupRouteObject.query[config.keyName] = stack[indexToPreserve].key;
+    stack[indexToPreserve].routeObject = backupRouteObject;
     return backupRouteObject.fullPath + `?${[config.keyName]}=${stack[indexToPreserve].key}`;
   }
 }
@@ -160,7 +167,9 @@ function _clearStackFinal(indexToPreserve = 0) {
   for (let i = 0; i < stack.length; i++) {
     if (i != indexToPreserve) {
       window.console.log('[VuePageStack] _clearStack - $destroy', i, stack[i]);
-      stack[i].vnode.componentInstance.$destroy();
+      if(stack[i].vnode && stack[i].vnode.componentInstance) {
+        stack[i].vnode.componentInstance.$destroy();
+      }
       stack[i] = null;
     }
   }
@@ -236,6 +245,25 @@ function clearStackToCurrent() {
   let indexToPreserve = stack.length - 1;
   let replaceWithRoute = _getReplaceWithRoute(indexToPreserve, vnode.componentInstance.$route);
   return _clearStack(indexToPreserve, replaceWithRoute);
+}
+
+function back(compareToRoute = null, strict = false) {
+  let routeObject = compareToRoute && compareToRoute.route ? compareToRoute.route : null;
+  return new Promise((resolve, reject) => {
+    if(strict) {
+      // check if a previous route is known
+      if(stack.length <= 1) {
+        // no previous route known
+        return reject();
+      }
+      if(routeObject) {
+        if(stack[stack.length - 2].routeObject.name != routeObject.name) {
+          return reject();
+        }
+      }
+    }
+    HistoryUtils.back().then(resolve()).catch(reject());
+  });
 }
 
 // function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preventNavigationFlag = true, replaceHistoryPathFlag = false) {

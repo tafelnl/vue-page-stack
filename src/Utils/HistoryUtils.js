@@ -39,6 +39,23 @@ export default {
 
   replace (url) {
     return this._push(url, true);
+  },
+
+  back() {
+    return new Promise((resolve, reject) => {
+      let oldCurrentUrl = window.location.href;
+      window.history.back();
+      // setTimeout needed to let back() finish first
+      setTimeout(() => {
+        let newCurrentUrl = window.location.href;
+        if(oldCurrentUrl == newCurrentUrl) {
+          // uhoh, probably did not went back in the history
+          reject();
+        } else {
+          resolve();
+        }
+      }, 10);
+    });
   }
 
 };
