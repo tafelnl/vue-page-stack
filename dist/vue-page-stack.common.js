@@ -2734,6 +2734,7 @@ function VuePageStack_replace() {
 function _push() {
   var route = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var replace = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  window.console.log('[VuePageStack] _push', route, replace);
   var key;
 
   if (route && route.query && route.query[config.keyName]) {
@@ -2768,7 +2769,8 @@ function _push() {
   } // push new item to stack
 
 
-  stack.push(stackObject); // replace or push new route
+  stack.push(stackObject);
+  window.console.log('[VuePageStack] _push', stackObject, routeObject); // replace or push new route
 
   if (replace) {
     return HistoryUtils.replace(routeObject.fullPath);
