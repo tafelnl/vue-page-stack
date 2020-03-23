@@ -2402,6 +2402,7 @@ var history_history = {
 
 
 
+
 function isDef(v) {
   return v !== undefined && v !== null;
 }
@@ -2425,6 +2426,15 @@ function getFirstComponentChild(children) {
 var stack = [];
 var preventNavigation = false;
 var vnode = null;
+var $router = null;
+
+function getKey(src) {
+  return src.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0;
+    var v = c === 'x' ? r : r & 0x3 | 0x8;
+    return v.toString(16);
+  });
+}
 
 function getIndexByKey(key) {
   for (var index = 0; index < stack.length; index++) {
@@ -2452,6 +2462,7 @@ var VuePageStack_VuePageStack = function VuePageStack(keyName) {
       }
     },
     render: function render() {
+      $router = this.$router;
       var key = this.$route.query[keyName];
       var slot = this.$slots.default;
       vnode = getFirstComponentChild(slot);
@@ -2717,6 +2728,57 @@ function back() {
 
     HistoryUtils.back().then(resolve()).catch(reject());
   });
+}
+
+function push() {
+  var route = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  return _push(route);
+}
+
+function VuePageStack_replace() {
+  var route = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  return _push(route, true);
+}
+
+function _push() {
+  var route = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var replace = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  var key;
+
+  if (route && route.query && route.query[config.keyName]) {
+    key = route.query[config.keyName];
+  } else {
+    key = getKey('xxxxxxxx');
+    route.query[config.keyName] = key;
+  }
+
+  var routeObject = $router.resolve(route);
+  var stackObject = {
+    key: key,
+    vnode: null,
+    routeObject: routeObject
+  };
+
+  if (replace) {
+    // remove and destroy last item from stack
+    var indexToReplace = stack.length - 1;
+
+    if (stack[indexToReplace] && stack[indexToReplace].vnode && stack[indexToReplace].vnode.componentInstance) {
+      stack[indexToReplace].vnode.componentInstance.$destroy();
+    }
+
+    stack[indexToReplace] = null;
+    stack.splice(indexToReplace);
+  } // push new item to stack
+
+
+  stack.push(stackObject); // replace or push new route
+
+  if (replace) {
+    return HistoryUtils.replace(routeObject.fullPath);
+  }
+
+  return HistoryUtils.push(routeObject.fullPath);
 } // function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preventNavigationFlag = true, replaceHistoryPathFlag = false) {
 //   return new Promise((resolve, reject) => {
 //     let currentRouteFullPath = (currentRoute) ? currentRoute.fullPath : window.location.href;
@@ -2847,7 +2909,7 @@ function hasKey(query, keyName) {
   return !!query[keyName];
 }
 
-function getKey(src) {
+function src_getKey(src) {
   return src.replace(/[xy]/g, function (c) {
     var r = Math.random() * 16 | 0;
     var v = c === 'x' ? r : r & 0x3 | 0x8;
@@ -2872,7 +2934,10 @@ VuePageStackPlugin.install = function (Vue, _ref) {
   Vue.prototype.$pageStack = {
     getStack: getStack,
     clearStackToCurrent: clearStackToCurrent,
-    clearStackToFirst: clearStackToFirst
+    clearStackToFirst: clearStackToFirst,
+    back: back,
+    push: push,
+    replace: VuePageStack_replace
   };
   mixin(router);
 
@@ -2886,8 +2951,10 @@ VuePageStackPlugin.install = function (Vue, _ref) {
     }
 
     if (!hasKey(to.query, keyName)) {
-      to.query[keyName] = getKey('xxxxxxxx');
-      var replace = src_history.action === config.replaceName || !hasKey(from.query, keyName);
+      to.query[keyName] = src_getKey('xxxxxxxx');
+
+      var _replace = src_history.action === config.replaceName || !hasKey(from.query, keyName);
+
       next({
         hash: to.hash,
         path: to.path,
@@ -2895,7 +2962,7 @@ VuePageStackPlugin.install = function (Vue, _ref) {
         params: to.params,
         query: to.query,
         meta: to.meta,
-        replace: replace
+        replace: _replace
       });
     } else {
       var index = getIndexByKey(to.query[keyName]);
