@@ -26,6 +26,16 @@ var stack = [];
 let preventNavigation = false;
 let vnode = null;
 
+let $router = null;
+
+function getKey(src) {
+  return src.replace(/[xy]/g, function(c) {
+    let r = (Math.random() * 16) | 0;
+    let v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 function getIndexByKey(key) {
   for (let index = 0; index < stack.length; index++) {
     if (stack[index].key === key) {
@@ -51,6 +61,7 @@ let VuePageStack = keyName => {
       }
     },
     render() {
+      $router = this.$router;
       let key = this.$route.query[keyName];
       const slot = this.$slots.default;
       vnode = getFirstComponentChild(slot);
@@ -266,6 +277,45 @@ function back(compareToRoute = null, strict = false) {
   });
 }
 
+function push(route = {}) {
+  return _push(route);
+}
+
+function replace(route = {}) {
+  return _push(route, true);
+}
+
+function _push(route = {}, replace = false) {
+  let key;
+  if (route && route.query && route.query[config.keyName]) {
+    key = route.query[config.keyName];
+  } else {
+    key = getKey('xxxxxxxx');
+    route.query[config.keyName] = key;
+  }
+  let routeObject = $router.resolve(route);
+  let stackObject = { key, vnode: null, routeObject: routeObject };
+
+  if (replace) {
+    // remove and destroy last item from stack
+    let indexToReplace = stack.length - 1;
+    if(stack[indexToReplace] && stack[indexToReplace].vnode && stack[indexToReplace].vnode.componentInstance) {
+      stack[indexToReplace].vnode.componentInstance.$destroy();
+    }
+    stack[indexToReplace] = null;
+    stack.splice(indexToReplace);
+  }
+
+  // push new item to stack
+  stack.push(stackObject);
+
+  // replace or push new route
+  if (replace) {
+    return HistoryUtils.replace(routeObject.fullPath);
+  }
+  return HistoryUtils.push(routeObject.fullPath);
+}
+
 // function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preventNavigationFlag = true, replaceHistoryPathFlag = false) {
 //   return new Promise((resolve, reject) => {
 //     let currentRouteFullPath = (currentRoute) ? currentRoute.fullPath : window.location.href;
@@ -323,4 +373,4 @@ function setPreventNavigation(value) {
   return preventNavigation = value;
 }
 
-export { VuePageStack, getIndexByKey, getStack, clearStackToCurrent, clearStackToFirst, getPreventNavigation, setPreventNavigation };
+export { VuePageStack, getIndexByKey, getStack, clearStackToCurrent, clearStackToFirst, back, push, replace, getPreventNavigation, setPreventNavigation };

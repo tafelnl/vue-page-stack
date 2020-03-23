@@ -1,4 +1,4 @@
-import { VuePageStack, getIndexByKey, getStack, clearStackToCurrent, clearStackToFirst, getPreventNavigation, setPreventNavigation } from './components/VuePageStack';
+import { VuePageStack, getIndexByKey, getStack, clearStackToCurrent, clearStackToFirst, back, push, replace, getPreventNavigation, setPreventNavigation } from './components/VuePageStack';
 import mixin from './mixin';
 import history from './history';
 import config from './config/config';
@@ -26,7 +26,10 @@ VuePageStackPlugin.install = function(Vue, { router, name = config.componentName
   Vue.prototype.$pageStack = {
     getStack,
     clearStackToCurrent,
-    clearStackToFirst
+    clearStackToFirst,
+    back,
+    push,
+    replace
   };
 
   mixin(router);
