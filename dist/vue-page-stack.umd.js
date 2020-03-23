@@ -2749,6 +2749,11 @@ function _push() {
     key = route.query[config.keyName];
   } else {
     key = getKey('xxxxxxxx');
+
+    if (!route.query) {
+      route.query = {};
+    }
+
     route.query[config.keyName] = key;
   }
 
