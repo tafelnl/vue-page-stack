@@ -2749,7 +2749,7 @@ function _push() {
     route.query[config.keyName] = key;
   }
 
-  var routeObject = $router.resolve(route);
+  var routeObject = $router.resolve(route).route;
   var stackObject = {
     key: key,
     vnode: null,
