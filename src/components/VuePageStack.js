@@ -291,6 +291,9 @@ function _push(route = {}, replace = false) {
     key = route.query[config.keyName];
   } else {
     key = getKey('xxxxxxxx');
+    if (!route.query) {
+      route.query = {};
+    }
     route.query[config.keyName] = key;
   }
   let routeObject = $router.resolve(route);
