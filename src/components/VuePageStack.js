@@ -298,7 +298,7 @@ function _push(route = {}, replace = false) {
     }
     route.query[config.keyName] = key;
   }
-  let routeObject = $router.resolve(route);
+  let routeObject = $router.resolve(route).route;
   let stackObject = { key, vnode: null, routeObject: routeObject };
 
   if (replace) {
