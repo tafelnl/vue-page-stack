@@ -286,6 +286,8 @@ function replace(route = {}) {
 }
 
 function _push(route = {}, replace = false) {
+  window.console.log('[VuePageStack] _push', route, replace)
+
   let key;
   if (route && route.query && route.query[config.keyName]) {
     key = route.query[config.keyName];
@@ -311,6 +313,8 @@ function _push(route = {}, replace = false) {
 
   // push new item to stack
   stack.push(stackObject);
+
+  window.console.log('[VuePageStack] _push', stackObject, routeObject)
 
   // replace or push new route
   if (replace) {
