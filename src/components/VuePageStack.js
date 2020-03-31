@@ -45,6 +45,14 @@ function getIndexByKey(key) {
   return -1;
 }
 
+var debug = true;
+
+function consoleLog(...params) {
+  if (window && debug) {
+    window.console.log(...params);
+  }
+}
+
 let VuePageStack = keyName => {
   return {
     name: config.componentName,
@@ -62,39 +70,50 @@ let VuePageStack = keyName => {
     },
     render() {
       $router = this.$router;
-      let key = this.$route.query[keyName];
+      const currentKey = this.$route.query[keyName];
       const slot = this.$slots.default;
       vnode = getFirstComponentChild(slot);
-      window.console.log('[VuePageStack] render', stack, vnode)
+      consoleLog('[VuePageStack] render', stack, vnode)
       if (!vnode) {
+        // skip
         return vnode;
       }
-      let index = getIndexByKey(key);
-      if (index !== -1) {
-        // went back in browser history to existing route
-        window.console.log('[VuePageStack] render - index !== -1')
-        if(!stack[index].vnode) {
-          stack[index].vnode = vnode;
+      let index = stack.findIndex(stackItem => stackItem.key === currentKey);
+      consoleLog('[VuePageStack] index', index)
+      if (stack[index]) {
+        consoleLog('[VuePageStack] key exists in stack', stack[index])
+        if (stack[index]?.vnode?.componentInstance) {
+          consoleLog('[VuePageStack] key exists in stack - previous vnode known -> replace current vnode with previous existing one')
+          consoleLog('[VuePageStack]', vnode, stack[index].vnode)
+          let { tag, data, key } = vnode;
+          vnode = stack[index].vnode;
+          vnode.tag = tag;
+          vnode.data = data;
+          vnode.key = key;
         } else {
-          vnode.componentInstance = stack[index].vnode.componentInstance;
+          consoleLog('[VuePageStack] key exists in stack - previous vnode unknown -> put current vnode to stack one')
+          stack[index].vnode = vnode;
         }
-        // destroy the instances that will be spliced
         for (let i = index + 1; i < stack.length; i++) {
-          window.console.log('[VuePageStack] render - $destroy')
-          if(stack[i].vnode && stack[i].vnode.componentInstance) {
+          // destroy the instances that will be spliced
+          consoleLog('[VuePageStack] remove from stack', i)
+          if(stack[i].vnode?.componentInstance) {
+            consoleLog('[VuePageStack] remove from stack - $destroy', i)
             stack[i].vnode.componentInstance.$destroy();
           }
           stack[i] = null;
         }
+        // remove every item after the current index from array
         stack.splice(index + 1);
       } else {
-        window.console.log('[VuePageStack] render - index === -1', history.action)
+        consoleLog('[VuePageStack] key does NOT exist in stack', history.action)
         if (history.action === config.replaceName || history.action === config.backName || history.action === config.goName) {
           // got to this route by either replacing the route or going back in history
           // replace stack item with new route
-          // first destroy the instance
-          window.console.log('[VuePageStack] render - $destroy')
-          if(stack[stack.length - 1].vnode && stack[stack.length - 1].vnode.componentInstance) {
+          consoleLog('[VuePageStack] remove from stack')
+          if (stack[stack.length - 1].vnode?.componentInstance) {
+            // first destroy the instance
+            consoleLog('[VuePageStack] remove from stack - $destroy')
             stack[stack.length - 1].vnode.componentInstance.$destroy();
           }
           stack[stack.length - 1] = null;
@@ -102,9 +121,12 @@ let VuePageStack = keyName => {
           stack.splice(stack.length - 1);
         }
         // add new route to stack
-        stack.push({ key, vnode, routeObject: this.$route });
+        stack.push({ key: currentKey, vnode, routeObject: this.$route });
       }
-      vnode.data.keepAlive = true;
+      if (vnode.data) {
+        vnode.data.keepAlive = true;
+      }
+      consoleLog('[VuePageStack] vnode', vnode)
       return vnode;
     }
   };
@@ -177,7 +199,7 @@ function _clearStackFinal(indexToPreserve = 0) {
   // except the one that should be preserved
   for (let i = 0; i < stack.length; i++) {
     if (i != indexToPreserve) {
-      window.console.log('[VuePageStack] _clearStack - $destroy', i, stack[i]);
+      consoleLog('[VuePageStack] _clearStack - $destroy', i, stack[i]);
       if(stack[i].vnode && stack[i].vnode.componentInstance) {
         stack[i].vnode.componentInstance.$destroy();
       }
@@ -191,7 +213,7 @@ function _clearStackFinal(indexToPreserve = 0) {
     // only preserve one item in the stack
     stack = [stack[indexToPreserve]];
   }
-  window.console.log('[VuePageStack] _clearStack - new stack:', stack)
+  consoleLog('[VuePageStack] _clearStack - new stack:', stack)
 }
 function _clearHistory(goBackN, options = {}) {
   return new Promise((resolve) => {
@@ -201,7 +223,7 @@ function _clearHistory(goBackN, options = {}) {
     }
     // merge options with defaultOptions
     Object.assign(defaultOptions, options);
-    window.console.log('[VuePageStack] _clearHistory', goBackN, defaultOptions);
+    consoleLog('[VuePageStack] _clearHistory', goBackN, defaultOptions);
     if (goBackN <= 0) {
       if (defaultOptions.replaceWithRoute) {
         // if replaceWithRoute is defined, replace current route
@@ -286,7 +308,7 @@ function replace(route = {}) {
 }
 
 function _push(route = {}, replace = false) {
-  window.console.log('[VuePageStack] _push', route, replace)
+  consoleLog('[VuePageStack] _push', route, replace)
 
   let key;
   if (route && route.query && route.query[config.keyName]) {
@@ -314,7 +336,7 @@ function _push(route = {}, replace = false) {
   // push new item to stack
   stack.push(stackObject);
 
-  window.console.log('[VuePageStack] _push', stackObject, routeObject)
+  consoleLog('[VuePageStack] _push', stackObject, routeObject)
 
   // replace or push new route
   if (replace) {
@@ -326,7 +348,7 @@ function _push(route = {}, replace = false) {
 // function _clearStack(replaceLeftOverItemWithRoute = {}, indexToLeave = 0, preventNavigationFlag = true, replaceHistoryPathFlag = false) {
 //   return new Promise((resolve, reject) => {
 //     let currentRouteFullPath = (currentRoute) ? currentRoute.fullPath : window.location.href;
-//     window.console.log('[VuePageStack] _clearStack - check', currentRouteFullPath);
+//     consoleLog('[VuePageStack] _clearStack - check', currentRouteFullPath);
 //     let goBackN = (stack.length) ? stack.length - 1 : 1;
 //     if (!goBackN) {
 //       // @TODO(1): check if current route name is correct
@@ -340,20 +362,20 @@ function _push(route = {}, replace = false) {
 //
 //
 //
-//     window.console.log('[VuePageStack] _clearStack - check', replaceLeftOverItemWithRoute, stack[indexToLeave]);
+//     consoleLog('[VuePageStack] _clearStack - check', replaceLeftOverItemWithRoute, stack[indexToLeave]);
 //     // check if currentVnode is the same as this vnode
 //     let key = vnode.componentInstance.$route.query[config.keyName];
 //     let index = getIndexByKey(key);
-//     window.console.log('[VuePageStack] _clearStack - check diff', index, indexToLeave);
+//     consoleLog('[VuePageStack] _clearStack - check diff', index, indexToLeave);
 //     if (index == indexToLeave) {
 //       // exactly the same
-//       window.console.log('[VuePageStack] _clearStack - same same', index, indexToLeave);
+//       consoleLog('[VuePageStack] _clearStack - same same', index, indexToLeave);
 //     } else if (replaceLeftOverItemWithRoute.name && stack[indexToLeave].vnode.componentInstance.fixedRoute) {
 //       // else check if route name is the same
 //       if (replaceLeftOverItemWithRoute.name == stack[indexToLeave].vnode.componentInstance.fixedRoute.name) {
-//         window.console.log('[VuePageStack] _clearStack - same NAME', replaceLeftOverItemWithRoute.name);
+//         consoleLog('[VuePageStack] _clearStack - same NAME', replaceLeftOverItemWithRoute.name);
 //       } else {
-//         window.console.log('[VuePageStack] _clearStack - different NAME', replaceLeftOverItemWithRoute.name);
+//         consoleLog('[VuePageStack] _clearStack - different NAME', replaceLeftOverItemWithRoute.name);
 //         replaceHistoryPathFlag = true;
 //         currentRouteFullPath = replaceLeftOverItemWithRoute.path;
 //         // @TODO(1): stack item ook vervangen voor de correcte

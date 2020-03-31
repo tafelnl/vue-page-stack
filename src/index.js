@@ -41,6 +41,11 @@ VuePageStackPlugin.install = function(Vue, { router, name = config.componentName
       setPreventNavigation(false);
       return;
     }
+    // if (to.query[keyName] && from.query[keyName] && to.query[keyName] == from.query[keyName]) {
+    //   window.console.log('[VuePageStack] navigated to same route')
+    //   next();
+    //   return;
+    // }
     if (!hasKey(to.query, keyName)) {
       to.query[keyName] = getKey('xxxxxxxx');
       let replace = history.action === config.replaceName || !hasKey(from.query, keyName);
